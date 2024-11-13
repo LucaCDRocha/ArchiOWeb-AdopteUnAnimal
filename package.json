@@ -1,16 +1,16 @@
 {
-  "name": "archi-o-web-adopte-un-animal",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "start": "node ./bin/start"
-  },
-  "dependencies": {
-    "debug": "^4.3.4",
-    "express": "^4.21.0",
-    "http-errors": "^2.0.0",
-    "mongoose": "^8.8.1",
-    "morgan": "^1.10.0"
-  }
+	"name": "ArchiOWeb-AdopteUnAnimal",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"start": "node ./bin/start"
+	},
+	"dependencies": {
+		"debug": "^4.3.4",
+		"express": "^4.21.0",
+		"http-errors": "^2.0.0",
+		"mongoose": "^8.8.1",
+		"morgan": "^1.10.0"
+	}
 }
