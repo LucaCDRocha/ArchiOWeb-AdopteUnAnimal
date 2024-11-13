@@ -25,7 +25,7 @@
         "description": "Concerne les spa présentes dans l'application"
       },
       {
-        "name": "adptions",
+        "name": "adoptions",
         "description": "Concerne les adoptions et les messages échangés entre utilisateurs et SPA"
       }
     ],
