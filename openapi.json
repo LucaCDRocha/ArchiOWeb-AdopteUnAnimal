@@ -1,88 +1,4 @@
 {
-<<<<<<< HEAD
-    "openapi": "3.0.0",
-    "info": {
-      "title": "AdopteUnAnimal",
-      "version": "1.0.0",
-      "description": "Cette API Une API REST développée avec [Express](https://expressjs.com/), permet de gérer des animaux à adopter. 
-      Vous pouvez  manipuler des Pets, Users, SPA, Messages et Adoptions."
-    },
-    "servers": [
-    {
-      "url": "https://www.test.ch/api/"
-    }
-    ],
-    "tags": [
-    {
-      "name": "pets",
-      "description": "Concerne les animaux à adopter"
-    },
-    {
-        "name": "users",
-        "description": "Concerne les utilisateurs et utilisatrices de l'application"
-      },
-      {
-        "name": "spa",
-        "description": "Concerne les spa présentes dans l'application"
-      },
-      {
-        "name": "adoptions",
-        "description": "Concerne les adoptions et les messages échangés entre utilisateurs et SPA"
-      }
-    ],
-    "paths": {
-      "/pets": {
-        "get": {
-            "tags": [
-                "pets"
-            ],
-          "summary": "Liste tous les animaux",
-        "description": "Rend tous les animaux disponibles à l'adoption",
-        "operationId": "updatePet - jsp ce que c'est ce truc",
-        "requestBody": {
-          "description": "Update an existent pet in the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Pet"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Pet"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "Pet not found"
-          },
-          "422": {
-            "description": "Validation exception"
-          }
-        },
-        "security": [
-          {
-            "petstore_auth": [
-              "write:pets",
-              "read:pets"
-            ]
-          }
-        ]
-      }
-    }
-  }
-=======
 	"openapi": "3.0.0",
 	"info": {
 		"title": "AdopteUnAnimal",
@@ -108,7 +24,7 @@
 			"description": "Concerne les spa présentes dans l'application"
 		},
 		{
-			"name": "adptions",
+			"name": "adoptions",
 			"description": "Concerne les adoptions et les messages échangés entre utilisateurs et SPA"
 		}
 	],
@@ -159,5 +75,4 @@
 			}
 		}
 	}
->>>>>>> da4cbb0fd6d3b539eded697d6b74a700d66b87ac
 }
