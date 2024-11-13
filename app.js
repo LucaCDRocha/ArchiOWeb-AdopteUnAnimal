@@ -7,6 +7,9 @@ mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost/ArchiOWeb-Adop
 
 import indexRouter from "./routes/index.js";
 import usersRouter from "./routes/users.js";
+import petsRouter from "./routes/pets.js";
+import spasRouter from "./routes/spas.js";
+import adoptionsRouter from "./routes/adoptions.js";
 
 const app = express();
 
@@ -16,6 +19,9 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
+app.use("/pets", petsRouter);
+app.use("/spas", spasRouter);
+app.use("/adoptions", adoptionsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
