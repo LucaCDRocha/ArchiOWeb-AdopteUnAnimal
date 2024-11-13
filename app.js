@@ -1,6 +1,9 @@
 import express from "express";
 import createError from "http-errors";
 import logger from "morgan";
+import fs from 'fs';
+import yaml from 'js-yaml';
+import swaggerUi from 'swagger-ui-express';
 
 import mongoose from 'mongoose';
 mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost/ArchiOWeb-AdopteUnAnimal');
@@ -9,6 +12,10 @@ import indexRouter from "./routes/index.js";
 import usersRouter from "./routes/users.js";
 
 const app = express();
+// Parse the OpenAPI document.
+const openApiDocument = yaml.load(fs.readFileSync('./openapi.json'));
+// Serve the Swagger UI documentation.
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
 app.use(logger("dev"));
 app.use(express.json());
