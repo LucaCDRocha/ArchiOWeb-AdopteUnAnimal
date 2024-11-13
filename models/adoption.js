@@ -7,7 +7,7 @@ const adoptionSchema = new Schema({
     pet_id: { type: mongoose.Types.ObjectId, ref: 'Pet' },
     messages: [
         {
-            _id: mongoose.Types.ObjectId,
+            _id: { type: mongoose.Types.ObjectId, default: () => new mongoose.Types.ObjectId() },
             content: String,
             date: Date,
             user_id: { type: mongoose.Types.ObjectId, ref: 'User' }
