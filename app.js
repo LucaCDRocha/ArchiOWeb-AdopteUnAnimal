@@ -1,9 +1,10 @@
 import express from "express";
 import createError from "http-errors";
 import logger from "morgan";
+import * as config from "./config.js";
 
 import mongoose from 'mongoose';
-mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost/ArchiOWeb-AdopteUnAnimal');
+mongoose.connect(config.databaseUrl);
 
 import indexRouter from "./routes/index.js";
 import usersRouter from "./routes/users.js";
@@ -13,7 +14,10 @@ import adoptionsRouter from "./routes/adoptions.js";
 
 const app = express();
 
-app.use(logger("dev"));
+if (process.env.NODE_ENV !== 'test') {
+  app.use(logger("dev"));
+}
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
