@@ -109,7 +109,7 @@ router.post("/login", function (req, res, next) {
 				// Login is valid...
 				const exp = Math.floor(Date.now() / 1000 + 60 * 60 * 24);
 				return signJwt({ sub: user._id, exp: exp }, config.secret).then((token) => {
-					res.send({ message: `Welcome ${user.email}!`, token });
+					res.send({ message: `Welcome ${user.email}!`, token, user_id: user._id });
 				});
 			});
 		})
