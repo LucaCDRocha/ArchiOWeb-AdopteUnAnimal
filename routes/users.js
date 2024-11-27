@@ -23,8 +23,20 @@ router.get("/", authenticate, function (req, res, next) {
 		});
 });
 
+router.get("/isAuthenticated", authenticate, function (req, res, next) {
+	try {
+		res.send({ isAuthenticated: true });
+	} catch (err) {
+		next(err);
+	}
+});
+
 router.get("/:id", loadUserByRequestId, authenticate, function (req, res, next) {
-	res.send(req.user);
+	try {
+		res.send(req.user);
+	} catch (err) {
+		next(err);
+	}
 });
 
 router.post("/", function (req, res, next) {
@@ -102,10 +114,6 @@ router.post("/login", function (req, res, next) {
 			});
 		})
 		.catch(next);
-});
-
-router.post("/authenticate", authenticate, function (req, res, next) {
-	res.send("Authenticated!");
 });
 
 export default router;
