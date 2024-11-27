@@ -7,7 +7,7 @@ const petSchema = new Schema({
   images: [
     {
       data: Buffer,
-      contentType: String,
+      imgType: String,
     },
   ],
   tags: [{ type: mongoose.Types.ObjectId, ref: "Tag" }],
