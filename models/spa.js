@@ -3,7 +3,9 @@ const { Schema } = mongoose;
 
 const spaSchema = new Schema({
 	nom: String,
-	place: String,
+	adresse: String,
+	latitude: String,
+	longitude: String,
 	user_id: { type: mongoose.Types.ObjectId, ref: "User" },
 });
 
