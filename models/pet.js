@@ -3,6 +3,7 @@ const { Schema } = mongoose;
 
 const petSchema = new Schema({
   nom: String,
+  age: Number,
   description: String,
   images: [
     {
