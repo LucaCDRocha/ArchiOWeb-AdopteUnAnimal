@@ -1,0 +1,1009 @@
+{
+	"openapi": "3.0.0",
+	"info": {
+	  "title": "AdopteUnAnimal",
+	  "version": "1.0.0",
+	  "description": "Cette API REST développée avec [Express](https://expressjs.com/), permet de gérer des animaux à adopter. Vous pouvez manipuler des Pets, Users, SPA, Messages et Adoptions."
+	},
+	"servers": [
+	  {
+		"url": "https://www.test.ch/api/"
+	  }
+	],
+	"tags": [
+	  {
+		"name": "pets",
+		"description": "Concerne les animaux à adopter"
+	  },
+	  {
+		"name": "users",
+		"description": "Concerne les utilisateurs et utilisatrices de l'application"
+	  },
+	  {
+		"name": "spa",
+		"description": "Concerne les spa présentes dans l'application"
+	  },
+	  {
+		"name": "adoptions",
+		"description": "Concerne les adoptions et les messages échangés entre utilisateurs et SPA"
+	  }
+	],
+	"paths": {
+	  "/pets": {
+		"get": {
+		  "tags": ["pets"],
+		  "summary": "Liste tous les animaux",
+		  "responses": {
+			"200": {
+			  "description": "Liste des animaux",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"type": "array",
+					"items": {
+					  "$ref": "#/components/schemas/Pet"
+					}
+				  }
+				}
+			  }
+			},
+			"400": {
+			  "description": "Requête invalide"
+			},
+			"401": {
+			  "description": "Non autorisé"
+			},
+			"404": {
+			  "description": "Non trouvé"
+			},
+			"500": {
+			  "description": "Erreur interne du serveur"
+			}
+		  }
+		},
+		"post": {
+		  "tags": ["pets"],
+		  "summary": "Ajoute un nouvel animal",
+		  "requestBody": {
+			"content": {
+			  "application/json": {
+				"schema": {
+				  "$ref": "#/components/schemas/Pet"
+				}
+			  }
+			}
+		  },
+		  "responses": {
+			"201": {
+			  "description": "Animal créé",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/Pet"
+				  }
+				}
+			  }
+			},
+			"400": {
+			  "description": "Requête invalide"
+			},
+			"401": {
+			  "description": "Non autorisé"
+			},
+			"500": {
+			  "description": "Erreur interne du serveur"
+			}
+		  }
+		}
+	  },
+	  "/pets/{id}": {
+		"get": {
+		  "tags": ["pets"],
+		  "summary": "Récupère un animal par ID",
+		  "parameters": [
+			{
+			  "name": "id",
+			  "in": "path",
+			  "required": true,
+			  "schema": {
+				"type": "string"
+			  }
+			}
+		  ],
+		  "responses": {
+			"200": {
+			  "description": "Détails de l'animal",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/Pet"
+				  }
+				}
+			  }
+			},
+			"400": {
+			  "description": "Requête invalide"
+			},
+			"401": {
+			  "description": "Non autorisé"
+			},
+			"404": {
+			  "description": "Non trouvé"
+			},
+			"500": {
+			  "description": "Erreur interne du serveur"
+			}
+		  }
+		},
+		"patch": {
+		  "tags": ["pets"],
+		  "summary": "Met à jour un animal par ID",
+		  "parameters": [
+			{
+			  "name": "id",
+			  "in": "path",
+			  "required": true,
+			  "schema": {
+				"type": "string"
+			  }
+			}
+		  ],
+		  "requestBody": {
+			"content": {
+			  "application/json": {
+				"schema": {
+				  "$ref": "#/components/schemas/Pet"
+				}
+			  }
+			}
+		  },
+		  "responses": {
+			"200": {
+			  "description": "Animal mis à jour",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/Pet"
+				  }
+				}
+			  }
+			},
+			"400": {
+			  "description": "Requête invalide"
+			},
+			"401": {
+			  "description": "Non autorisé"
+			},
+			"404": {
+			  "description": "Non trouvé"
+			},
+			"500": {
+			  "description": "Erreur interne du serveur"
+			}
+		  }
+		},
+		"delete": {
+		  "tags": ["pets"],
+		  "summary": "Supprime un animal par ID",
+		  "parameters": [
+			{
+			  "name": "id",
+			  "in": "path",
+			  "required": true,
+			  "schema": {
+				"type": "string"
+			  }
+			}
+		  ],
+		  "responses": {
+			"204": {
+			  "description": "Animal supprimé"
+			},
+			"400": {
+			  "description": "Requête invalide"
+			},
+			"401": {
+			  "description": "Non autorisé"
+			},
+			"404": {
+			  "description": "Non trouvé"
+			},
+			"500": {
+			  "description": "Erreur interne du serveur"
+			}
+		  }
+		}
+	  },
+	  "/users": {
+		"get": {
+		  "tags": ["users"],
+		  "summary": "Liste tous les utilisateurs",
+		  "responses": {
+			"200": {
+			  "description": "Liste des utilisateurs",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"type": "array",
+					"items": {
+					  "$ref": "#/components/schemas/User"
+					}
+				  }
+				}
+			  }
+			},
+			"400": {
+			  "description": "Requête invalide"
+			},
+			"401": {
+			  "description": "Non autorisé"
+			},
+			"404": {
+			  "description": "Non trouvé"
+			},
+			"500": {
+			  "description": "Erreur interne du serveur"
+			}
+		  }
+		},
+		"post": {
+		  "tags": ["users"],
+		  "summary": "Ajoute un nouvel utilisateur",
+		  "requestBody": {
+			"content": {
+			  "application/json": {
+				"schema": {
+				  "$ref": "#/components/schemas/User"
+				}
+			  }
+			}
+		  },
+		  "responses": {
+			"201": {
+			  "description": "Utilisateur créé",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/User"
+				  }
+				}
+			  }
+			},
+			"400": {
+			  "description": "Requête invalide"
+			},
+			"401": {
+			  "description": "Non autorisé"
+			},
+			"500": {
+			  "description": "Erreur interne du serveur"
+			}
+		  }
+		}
+	  },
+	  "/users/{id}": {
+		"get": {
+		  "tags": ["users"],
+		  "summary": "Récupère un utilisateur par ID",
+		  "parameters": [
+			{
+			  "name": "id",
+			  "in": "path",
+			  "required": true,
+			  "schema": {
+				"type": "string"
+			  }
+			}
+		  ],
+		  "responses": {
+			"200": {
+			  "description": "Détails de l'utilisateur",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/User"
+				  }
+				}
+			  }
+			},
+			"400": {
+			  "description": "Requête invalide"
+			},
+			"401": {
+			  "description": "Non autorisé"
+			},
+			"404": {
+			  "description": "Non trouvé"
+			},
+			"500": {
+			  "description": "Erreur interne du serveur"
+			}
+		  }
+		},
+		"put": {
+		  "tags": ["users"],
+		  "summary": "Met à jour un utilisateur par ID",
+		  "parameters": [
+			{
+			  "name": "id",
+			  "in": "path",
+			  "required": true,
+			  "schema": {
+				"type": "string"
+			  }
+			}
+		  ],
+		  "requestBody": {
+			"content": {
+			  "application/json": {
+				"schema": {
+				  "$ref": "#/components/schemas/User"
+				}
+			  }
+			}
+		  },
+		  "responses": {
+			"200": {
+			  "description": "Utilisateur mis à jour",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/User"
+				  }
+				}
+			  }
+			},
+			"400": {
+			  "description": "Requête invalide"
+			},
+			"401": {
+			  "description": "Non autorisé"
+			},
+			"404": {
+			  "description": "Non trouvé"
+			},
+			"500": {
+			  "description": "Erreur interne du serveur"
+			}
+		  }
+		},
+		"delete": {
+		  "tags": ["users"],
+		  "summary": "Supprime un utilisateur par ID",
+		  "parameters": [
+			{
+			  "name": "id",
+			  "in": "path",
+			  "required": true,
+			  "schema": {
+				"type": "string"
+			  }
+			}
+		  ],
+		  "responses": {
+			"204": {
+			  "description": "Utilisateur supprimé"
+			},
+			"400": {
+			  "description": "Requête invalide"
+			},
+			"401": {
+			  "description": "Non autorisé"
+			},
+			"404": {
+			  "description": "Non trouvé"
+			},
+			"500": {
+			  "description": "Erreur interne du serveur"
+			}
+		  }
+		}
+	  },
+	  "/spas": {
+		"get": {
+		  "tags": ["spa"],
+		  "summary": "Liste toutes les SPA",
+		  "responses": {
+			"200": {
+			  "description": "Liste des SPA",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"type": "array",
+					"items": {
+					  "$ref": "#/components/schemas/Spa"
+					}
+				  }
+				}
+			  }
+			},
+			"400": {
+			  "description": "Requête invalide"
+			},
+			"401": {
+			  "description": "Non autorisé"
+			},
+			"404": {
+			  "description": "Non trouvé"
+			},
+			"500": {
+			  "description": "Erreur interne du serveur"
+			}
+		  }
+		},
+		"post": {
+		  "tags": ["spa"],
+		  "summary": "Ajoute une nouvelle SPA",
+		  "requestBody": {
+			"content": {
+			  "application/json": {
+				"schema": {
+				  "$ref": "#/components/schemas/Spa"
+				}
+			  }
+			}
+		  },
+		  "responses": {
+			"201": {
+			  "description": "SPA créée",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/Spa"
+				  }
+				}
+			  }
+			},
+			"400": {
+			  "description": "Requête invalide"
+			},
+			"401": {
+			  "description": "Non autorisé"
+			},
+			"500": {
+			  "description": "Erreur interne du serveur"
+			}
+		  }
+		}
+	  },
+	  "/spas/{id}": {
+		"get": {
+		  "tags": ["spa"],
+		  "summary": "Récupère une SPA par ID",
+		  "parameters": [
+			{
+			  "name": "id",
+			  "in": "path",
+			  "required": true,
+			  "schema": {
+				"type": "string"
+			  }
+			}
+		  ],
+		  "responses": {
+			"200": {
+			  "description": "Détails de la SPA",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/Spa"
+				  }
+				}
+			  }
+			},
+			"400": {
+			  "description": "Requête invalide"
+			},
+			"401": {
+			  "description": "Non autorisé"
+			},
+			"404": {
+			  "description": "Non trouvé"
+			},
+			"500": {
+			  "description": "Erreur interne du serveur"
+			}
+		  }
+		},
+		"put": {
+		  "tags": ["spa"],
+		  "summary": "Met à jour une SPA par ID",
+		  "parameters": [
+			{
+			  "name": "id",
+			  "in": "path",
+			  "required": true,
+			  "schema": {
+				"type": "string"
+			  }
+			}
+		  ],
+		  "requestBody": {
+			"content": {
+			  "application/json": {
+				"schema": {
+				  "$ref": "#/components/schemas/Spa"
+				}
+			  }
+			}
+		  },
+		  "responses": {
+			"200": {
+			  "description": "SPA mise à jour",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/Spa"
+				  }
+				}
+			  }
+			},
+			"400": {
+			  "description": "Requête invalide"
+			},
+			"401": {
+			  "description": "Non autorisé"
+			},
+			"404": {
+			  "description": "Non trouvé"
+			},
+			"500": {
+			  "description": "Erreur interne du serveur"
+			}
+		  }
+		},
+		"delete": {
+		  "tags": ["spa"],
+		  "summary": "Supprime une SPA par ID",
+		  "parameters": [
+			{
+			  "name": "id",
+			  "in": "path",
+			  "required": true,
+			  "schema": {
+				"type": "string"
+			  }
+			}
+		  ],
+		  "responses": {
+			"204": {
+			  "description": "SPA supprimée"
+			},
+			"400": {
+			  "description": "Requête invalide"
+			},
+			"401": {
+			  "description": "Non autorisé"
+			},
+			"404": {
+			  "description": "Non trouvé"
+			},
+			"500": {
+			  "description": "Erreur interne du serveur"
+			}
+		  }
+		}
+	  },
+	  "/adoptions": {
+		"get": {
+		  "tags": ["adoptions"],
+		  "summary": "Liste toutes les adoptions",
+		  "responses": {
+			"200": {
+			  "description": "Liste des adoptions",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"type": "array",
+					"items": {
+					  "$ref": "#/components/schemas/Adoption"
+					}
+				  }
+				}
+			  }
+			},
+			"400": {
+			  "description": "Requête invalide"
+			},
+			"401": {
+			  "description": "Non autorisé"
+			},
+			"404": {
+			  "description": "Non trouvé"
+			},
+			"500": {
+			  "description": "Erreur interne du serveur"
+			}
+		  }
+		},
+		"post": {
+		  "tags": ["adoptions"],
+		  "summary": "Ajoute une nouvelle adoption",
+		  "requestBody": {
+			"content": {
+			  "application/json": {
+				"schema": {
+				  "$ref": "#/components/schemas/Adoption"
+				}
+			  }
+			}
+		  },
+		  "responses": {
+			"201": {
+			  "description": "Adoption créée",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/Adoption"
+				  }
+				}
+			  }
+			},
+			"400": {
+			  "description": "Requête invalide"
+			},
+			"401": {
+			  "description": "Non autorisé"
+			},
+			"500": {
+			  "description": "Erreur interne du serveur"
+			}
+		  }
+		}
+	  },
+	  "/adoptions/{id}": {
+		"get": {
+		  "tags": ["adoptions"],
+		  "summary": "Récupère une adoption par ID",
+		  "parameters": [
+			{
+			  "name": "id",
+			  "in": "path",
+			  "required": true,
+			  "schema": {
+				"type": "string"
+			  }
+			}
+		  ],
+		  "responses": {
+			"200": {
+			  "description": "Détails de l'adoption",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/Adoption"
+				  }
+				}
+			  }
+			},
+			"400": {
+			  "description": "Requête invalide"
+			},
+			"401": {
+			  "description": "Non autorisé"
+			},
+			"404": {
+			  "description": "Non trouvé"
+			},
+			"500": {
+			  "description": "Erreur interne du serveur"
+			}
+		  }
+		},
+		"delete": {
+		  "tags": ["adoptions"],
+		  "summary": "Supprime une adoption par ID",
+		  "parameters": [
+			{
+			  "name": "id",
+			  "in": "path",
+			  "required": true,
+			  "schema": {
+				"type": "string"
+			  }
+			}
+		  ],
+		  "responses": {
+			"204": {
+			  "description": "Adoption supprimée"
+			},
+			"400": {
+			  "description": "Requête invalide"
+			},
+			"401": {
+			  "description": "Non autorisé"
+			},
+			"404": {
+			  "description": "Non trouvé"
+			},
+			"500": {
+			  "description": "Erreur interne du serveur"
+			}
+		  }
+		}
+	  },
+	  "/adoptions/{id}/messages": {
+		"get": {
+		  "tags": ["adoptions"],
+		  "summary": "Liste tous les messages d'une adoption",
+		  "parameters": [
+			{
+			  "name": "id",
+			  "in": "path",
+			  "required": true,
+			  "schema": {
+				"type": "string"
+			  }
+			}
+		  ],
+		  "responses": {
+			"200": {
+			  "description": "Liste des messages",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"type": "array",
+					"items": {
+					  "$ref": "#/components/schemas/Message"
+					}
+				  }
+				}
+			  }
+			},
+			"400": {
+			  "description": "Requête invalide"
+			},
+			"401": {
+			  "description": "Non autorisé"
+			},
+			"404": {
+			  "description": "Non trouvé"
+			},
+			"500": {
+			  "description": "Erreur interne du serveur"
+			}
+		  }
+		},
+		"post": {
+		  "tags": ["adoptions"],
+		  "summary": "Ajoute un nouveau message à une adoption",
+		  "parameters": [
+			{
+			  "name": "id",
+			  "in": "path",
+			  "required": true,
+			  "schema": {
+				"type": "string"
+			  }
+			}
+		  ],
+		  "requestBody": {
+			"content": {
+			  "application/json": {
+				"schema": {
+				  "$ref": "#/components/schemas/Message"
+				}
+			  }
+			}
+		  },
+		  "responses": {
+			"201": {
+			  "description": "Message créé",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/Message"
+				  }
+				}
+			  }
+			},
+			"400": {
+			  "description": "Requête invalide"
+			},
+			"401": {
+			  "description": "Non autorisé"
+			},
+			"500": {
+			  "description": "Erreur interne du serveur"
+			}
+		  }
+		}
+	  },
+	  "/adoptions/{id}/messages/{msg_id}": {
+		"delete": {
+		  "tags": ["adoptions"],
+		  "summary": "Supprime un message par ID",
+		  "parameters": [
+			{
+			  "name": "id",
+			  "in": "path",
+			  "required": true,
+			  "schema": {
+				"type": "string"
+			  }
+			},
+			{
+			  "name": "msg_id",
+			  "in": "path",
+			  "required": true,
+			  "schema": {
+				"type": "string"
+			  }
+			}
+		  ],
+		  "responses": {
+			"204": {
+			  "description": "Message supprimé"
+			},
+			"400": {
+			  "description": "Requête invalide"
+			},
+			"401": {
+			  "description": "Non autorisé"
+			},
+			"404": {
+			  "description": "Non trouvé"
+			},
+			"500": {
+			  "description": "Erreur interne du serveur"
+			}
+		  }
+		}
+	  }
+	},
+	"components": {
+	  "schemas": {
+		"Pet": {
+		  "type": "object",
+		  "properties": {
+			"_id": {
+			  "type": "string"
+			},
+			"nom": {
+			  "type": "string"
+			},
+			"description": {
+			  "type": "string"
+			},
+			"images": {
+			  "type": "array",
+			  "items": {
+				"$ref": "#/components/schemas/Images"
+			  }
+			},
+			"tags": {
+			  "type": "array",
+			  "items": {
+				"$ref": "#/components/schemas/Id"
+			  }
+			},
+			"spa_id": {
+			  "type": "string"
+			},
+			"likes_count": {
+			  "type": "integer"
+			},
+			"dislikes_count": {
+			  "type": "integer"
+			}
+		  }
+		},
+		"Images": {
+		  "type": "object",
+		  "properties": {
+			"data": {
+			  "type": "Buffer"
+			},
+			"imgType": {
+			  "type": "string"
+			}
+		  }
+		},
+		"User": {
+		  "type": "object",
+		  "properties": {
+			"_id": {
+			  "type": "string"
+			},
+			"firstName": {
+			  "type": "string"
+			},
+			"lastName": {
+			  "type": "string"
+			},
+			"email": {
+			  "type": "string"
+			},
+			"password": {
+			  "type": "string"
+			},
+			"likes": {
+			  "type": "array",
+			  "items": {
+				"$ref": "#/components/schemas/Id"
+			  }
+			},
+			"dislikes": {
+			  "type": "array",
+			  "items": {
+				"$ref": "#/components/schemas/Id"
+			  }
+			},
+			"adoptions": {
+			  "type": "array",
+			  "items": {
+				"$ref": "#/components/schemas/Id"
+			  }
+			}
+		  }
+		},
+		"Spa": {
+		  "type": "object",
+		  "properties": {
+			"_id": {
+			  "type": "string"
+			},
+			"nom": {
+			  "type": "string"
+			},
+			"place": {
+			  "type": "string"
+			},
+			"user_id": {
+			  "type": "string"
+			}
+		  }
+		},
+		"Adoption": {
+		  "type": "object",
+		  "properties": {
+			"_id": {
+			  "type": "string"
+			},
+			"date": {
+			  "type": "string",
+			  "format": "date-time"
+			},
+			"user_id": {
+			  "type": "string"
+			},
+			"pet_id": {
+			  "type": "string"
+			},
+			"messages": {
+			  "type": "array",
+			  "items": {
+				"$ref": "#/components/schemas/Message"
+			  }
+			}
+		  }
+		},
+		"Message": {
+		  "type": "object",
+		  "properties": {
+			"_id": {
+			  "type": "string"
+			},
+			"content": {
+			  "type": "string"
+			},
+			"date": {
+			  "type": "string",
+			  "format": "date-time"
+			},
+			"user_id": {
+			  "type": "string"
+			}
+		  }
+		},
+		"Id": {
+		  "type": "object",
+		  "properties": {
+			"_id": {
+			  "type": "string"
+			}
+		  }
+		}
+	  }
+	}
+  }
