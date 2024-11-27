@@ -104,4 +104,8 @@ router.post("/login", function (req, res, next) {
 		.catch(next);
 });
 
+router.post("/authenticate", authenticate, function (req, res, next) {
+	res.send("Authenticated!");
+});
+
 export default router;
