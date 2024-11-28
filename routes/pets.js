@@ -1,9 +1,18 @@
 import express from "express";
+import Pet from "../models/pet.js";
 
 const router = express.Router();
 
 router.get("/", function (req, res, next) {
-	res.send("Got a response from the pets route");
+	Pet.find()
+		.sort("dislikes_count")
+		.exec()
+		.then((pets) => {
+			res.send(pets);
+		})
+		.catch((err) => {
+			next(err);
+		});
 });
 
 router.get("/:id", function (req, res, next) {
