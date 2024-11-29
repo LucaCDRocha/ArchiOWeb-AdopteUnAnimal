@@ -5,7 +5,8 @@
 	"type": "module",
 	"scripts": {
 		"dev": "nodemon",
-		"start": "node ./bin/start"
+		"start": "node ./bin/start",
+		"populate": "node RemplirDataBase.js"
 	},
 	"dependencies": {
 		"bcrypt": "^5.1.1",
