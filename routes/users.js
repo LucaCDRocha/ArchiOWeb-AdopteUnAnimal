@@ -6,6 +6,8 @@ import { promisify } from "util";
 import * as config from "../config.js";
 import User from "../models/user.js";
 import { authenticate } from "./auth.js";
+import Adoption from "../models/adoption.js";
+import Pet from "../models/pet.js";
 
 const signJwt = promisify(jwt.sign);
 
@@ -31,7 +33,7 @@ router.get("/isAuthenticated", authenticate, function (req, res, next) {
 	}
 });
 
-router.get("/:id", loadUserByRequestId, authenticate, function (req, res, next) {
+router.get("/:id", authenticate, loadUserByRequestId, function (req, res, next) {
 	try {
 		res.send(req.user);
 	} catch (err) {
@@ -57,7 +59,7 @@ router.post("/", function (req, res, next) {
 		});
 });
 
-router.put("/:id", loadUserByRequestId, authenticate, async function (req, res, next) {
+router.put("/:id", authenticate, loadUserByRequestId, async function (req, res, next) {
 	if (req.currentUserId !== req.params.id) {
 		return res.sendStatus(403); // Forbidden
 	}
@@ -65,10 +67,24 @@ router.put("/:id", loadUserByRequestId, authenticate, async function (req, res, 
 	const user = req.user;
 	user.firstName = req.body.firstName;
 	user.lastName = req.body.lastName;
+	user.email = req.body.email;
+
+	if (req.body.password) {
+		try {
+			user.password = await bcrypt.hash(req.body.password, config.bcryptCostFactor);
+		} catch (err) {
+			return next(err);
+		}
+	}
+
 	try {
 		await user.save();
 		res.send(user);
 	} catch (err) {
+		if (err.code === 11000) {
+			// Duplicate key error
+			return res.status(409).send({ message: "Email already exists" });
+		}
 		next(err);
 	}
 });
@@ -83,7 +99,7 @@ async function loadUserByRequestId(req, res, next) {
 	next();
 }
 
-router.delete("/:id", loadUserByRequestId, authenticate, async function (req, res, next) {
+router.delete("/:id", authenticate, loadUserByRequestId, async function (req, res, next) {
 	if (req.currentUserId !== req.params.id) {
 		return res.sendStatus(403); // Forbidden
 	}
@@ -96,16 +112,34 @@ router.delete("/:id", loadUserByRequestId, authenticate, async function (req, re
 	}
 });
 
-router.get("/:id/adoptions", function (req, res, next) {
-	res.send("Got a response from the users route with id/adoptions");
+router.get("/:id/adoptions", authenticate, loadUserByRequestId, function (req, res, next) {
+	User.findById(req.params.id)
+		.populate("adoptions")
+		.exec()
+		.then((user) => {
+			res.send(user.adoptions);
+		})
+		.catch(next);
 });
 
-router.get("/:id/likes", function (req, res, next) {
-	res.send("Got a response from the users route with id/likes");
+router.get("/:id/likes", authenticate, loadUserByRequestId, function (req, res, next) {
+	User.findById(req.params.id)
+		.populate("likes")
+		.exec()
+		.then((user) => {
+			res.send(user.likes);
+		})
+		.catch(next);
 });
 
-router.get("/:id/dislikes", function (req, res, next) {
-	res.send("Got a response from the users route with id/dislikes");
+router.get("/:id/dislikes", authenticate, loadUserByRequestId, function (req, res, next) {
+	User.findById(req.params.id)
+		.populate("dislikes")
+		.exec()
+		.then((user) => {
+			res.send(user.dislikes);
+		})
+		.catch(next);
 });
 
 router.post("/login", function (req, res, next) {
