@@ -18,17 +18,23 @@ mongoose.connect(
 
 const spaParis = new Spa({
   nom: "SPA de Paris",
-  place: "Paris",
+	adresse: "Paris",
+	latitude: 567,
+	longitude: 1235,
 });
 
 const spaMorges = new Spa({
-  nom: "SPA de Morges",
-  place: "Morges",
+	nom: "SPA de Morges",
+	adresse: "Morges",
+	latitude: 345,
+	longitude: 1235,
 });
 
 const spaZurich = new Spa({
-  nom: "SPA de Zurich",
-  place: "Zurich",
+	nom: "SPA de Zurich",
+	adresse: "Zurich",
+	latitude: 345,
+	longitude: 1235,
 });
 
 const tagChien = new Tag({
