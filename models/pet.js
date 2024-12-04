@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 const petSchema = new Schema({
-  nom: String,
-  age: Number,
-  description: String,
+  nom: { type: String, required: true },
+  age: { type: Number, required: true },
+  description: { type: String, required: true },
   images: [
     {
       data: Buffer,
