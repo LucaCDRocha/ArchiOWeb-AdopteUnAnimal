@@ -1,37 +1,119 @@
 import express from "express";
+import Adoption from "../models/adoption.js";
+import User from "../models/user.js";
+import Pet from "../models/pet.js";
+import { authenticate } from "./auth.js";
 
 const router = express.Router();
 
-router.get("/", function (req, res, next) {
-  res.send("Got a response from the adoptions route");
+router.get("/", authenticate, function (req, res, next) {
+  Adoption.find()
+    .populate("user_id")
+    .populate("pet_id")
+    .exec()
+    .then((adoptions) => {
+      res.send(adoptions);
+    })
+    .catch((err) => {
+      next(err);
+    });
 });
 
-router.post("/adoptions", function (req, res, next) {
-  res.send("Got a POST request at /adoptions");
+router.post("/", function (req, res, next) {
+  const newAdoption = new Adoption(req.body);
+  newAdoption
+    .save()
+    .then((adoption) => {
+      res.status(201).send(adoption);
+    })
+    .catch((err) => {
+      next(err);
+    });
 });
 
-router.get("/adoptions", function (req, res, next) {
-  res.send("Got a GET request at /adoptions");
+router.get("/:id", authenticate, function (req, res, next) {
+  Adoption.findById(req.params.id)
+    .populate("user_id")
+    .populate("pet_id")
+    .exec()
+    .then((adoption) => {
+      if (!adoption) {
+        return res.status(404).send("Adoption not found");
+      }
+      res.send(adoption);
+    })
+    .catch((err) => {
+      next(err);
+    });
 });
 
-router.get("/adoptions/:id", function (req, res, next) {
-  res.send("Got a response from the adoptions route with id");
+router.delete("/:id", authenticate, function (req, res, next) {
+  Adoption.findByIdAndDelete(req.params.id)
+    .exec()
+    .then((adoption) => {
+      if (!adoption) {
+        return res.status(404).send("Adoption not found");
+      }
+      res.send("Adoption deleted successfully");
+    })
+    .catch((err) => {
+      next(err);
+    });
 });
 
-router.delete("/adoptions/:id", function (req, res, next) {
-  res.send("Got a response from the adoptions route with id");
+router.get("/:id/messages", authenticate, function (req, res, next) {
+  Adoption.findById(req.params.id)
+    .populate("messages.user_id")
+    .exec()
+    .then((adoption) => {
+      if (!adoption) {
+        return res.status(404).send("Adoption not found");
+      }
+      res.send(adoption.messages);
+    })
+    .catch((err) => {
+      next(err);
+    });
 });
 
-router.get("/adoptions/:id/messages", function (req, res, next) {
-  res.send("Got a response from the adoptions route with id and messages");
+router.post("/:id/messages", authenticate, function (req, res, next) {
+  Adoption.findById(req.params.id)
+    .exec()
+    .then((adoption) => {
+      if (!adoption) {
+        return res.status(404).send("Adoption not found");
+      }
+      adoption.messages.push(req.body);
+      return adoption.save().then((updatedAdoption) => {
+        res.status(201).send(updatedAdoption.messages);
+      });
+    })
+    .catch((err) => {
+      next(err);
+    });
 });
 
-router.post("/adoptions/:id/messages", function (req, res, next) {
-  res.send("Got a response from the adoptions route with id and messages");
-});
-
-router.delete("/adoptions/:id/messages/:msg_id", function (req, res, next) {
-  res.send("Got a response from the adoptions route with id and messages");
+router.delete("/:id/messages/:msg_id", authenticate, function (req, res, next) {
+  Adoption.findById(req.params.id)
+    .exec()
+    .then((adoption) => {
+      if (!adoption) {
+        return res.status(404).send("Adoption not found");
+      }
+      const messageIndex = adoption.messages.findIndex(
+        (msg) => msg._id.toString() === req.params.msg_id
+      );
+      if (messageIndex === -1) {
+        return res.status(404).send("Message not found");
+      }
+      adoption.messages.splice(messageIndex, 1);
+      return adoption.save().then((updatedAdoption) => {
+        res.send(updatedAdoption.messages);
+      });
+    })
+    .catch((err) => {
+      next(err);
+    });
 });
 
 export default router;
