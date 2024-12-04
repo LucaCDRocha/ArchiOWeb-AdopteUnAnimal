@@ -83,8 +83,17 @@ async function loadUserByRequestId(req, res, next) {
 	next();
 }
 
-router.delete("/:id", function (req, res, next) {
-	res.send("Got a DELETE request from the users route with id");
+router.delete("/:id", loadUserByRequestId, authenticate, async function (req, res, next) {
+	if (req.currentUserId !== req.params.id) {
+		return res.sendStatus(403); // Forbidden
+	}
+
+	try {
+		await User.deleteOne({ _id: req.params.id });
+		res.sendStatus(204); // No Content
+	} catch (err) {
+		next(err);
+	}
 });
 
 router.get("/:id/adoptions", function (req, res, next) {
@@ -109,7 +118,7 @@ router.post("/login", function (req, res, next) {
 				// Login is valid...
 				const exp = Math.floor(Date.now() / 1000 + 60 * 60 * 24);
 				return signJwt({ sub: user._id, exp: exp }, config.secret).then((token) => {
-					res.send({ message: `Welcome ${user.email}!`, token, user_id: user._id });
+					res.send({ message: `Welcome ${user.email}!`, token });
 				});
 			});
 		})
