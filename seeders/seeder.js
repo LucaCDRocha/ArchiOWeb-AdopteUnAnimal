@@ -1,12 +1,12 @@
 // Importer les dépendances nécessaires
 import mongoose from "mongoose";
-import Pet from "./models/pet.js";
-import Spa from "./models/spa.js";
-import User from "./models/user.js";
-import Tag from "./models/tag.js";
-import Adoption from "./models/adoption.js";
+import Pet from "../models/pet.js";
+import Spa from "../models/spa.js";
+import User from "../models/user.js";
+import Tag from "../models/tag.js";
+import Adoption from "../models/adoption.js";
 import bcrypt from "bcrypt";
-import * as config from "./config.js";
+import * as config from "../config.js";
 import fs from "fs";
 import path from "path";
 

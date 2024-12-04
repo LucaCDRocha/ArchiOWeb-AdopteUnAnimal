@@ -6,7 +6,7 @@
 	"scripts": {
 		"dev": "nodemon",
 		"start": "node ./bin/start",
-		"populate": "node RemplirDataBase.js"
+		"seed": "node ./seeders/seeder.js"
 	},
 	"dependencies": {
 		"bcrypt": "^5.1.1",
