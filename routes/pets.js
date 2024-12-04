@@ -87,6 +87,10 @@ router.put("/:id/like", function (req, res, next) {
 		});
 });
 
+router.delete("/:id/like", function (req, res, next) {
+  res.send("Got a DELETE request from the pets route with id/like");
+});
+
 router.put("/:id/dislike", function (req, res, next) {
 	Pet.findByIdAndUpdate(req.params.id, { $inc: { dislikes_count: 1 } }, { new: true })
 		.exec()
