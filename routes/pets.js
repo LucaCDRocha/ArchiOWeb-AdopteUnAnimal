@@ -1,5 +1,7 @@
 import express from "express";
 import Pet from "../models/pet.js";
+import Tag from "../models/tag.js";	
+import Spa from "../models/spa.js";
 
 const router = express.Router();
 
@@ -17,6 +19,8 @@ router.get("/", function (req, res, next) {
 
 router.get("/:id", function (req, res, next) {
   Pet.findById(req.params.id)
+    .populate("tags")
+	.populate("spa_id")
     .exec()
     .then((pet) => {
       if (!pet) {
