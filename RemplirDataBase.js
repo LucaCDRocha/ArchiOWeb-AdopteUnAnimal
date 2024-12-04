@@ -15,12 +15,25 @@ dotenv.config();
 mongoose.connect(
   process.env.DATABASE_URL || "mongodb://localhost/ArchiOWeb-AdopteUnAnimal"
 );
+const userParis = new User({
+  firstName: "Jane",
+  lastName: "Doe",
+  email: "jane.doe@example.com",
+  password: "password123",
+});
+const userclient = new User({
+  firstName: "John",
+  lastName: "Doe",
+  email: "john.doe@example.com",
+  password: "password123",
 
+});
 const spaParis = new Spa({
   nom: "SPA de Paris",
 	adresse: "Paris",
 	latitude: 567,
 	longitude: 1235,
+  user_id: userParis._id,
 });
 
 const spaMorges = new Spa({
@@ -59,8 +72,8 @@ const chienToffee = new Pet({
   ],
   tags: [tagChien._id],
   spa_id: spaParis._id,
-  likes_count: 50,
-  dislikes_count: 3,
+  likes_count: 0,
+  dislikes_count: 0,
 });
 const chienCara = new Pet({
   nom: "Cara",
@@ -74,8 +87,8 @@ const chienCara = new Pet({
   ],
   tags: [tagChien._id],
   spa_id: spaParis._id,
-  likes_count: 5,
-  dislikes_count: 3,
+  likes_count: 0,
+  dislikes_count: 0,
 });
 const chienBeth = new Pet({
   nom: "Bethany",
@@ -89,8 +102,8 @@ const chienBeth = new Pet({
   ],
   tags: [tagChien._id],
   spa_id: spaParis._id,
-  likes_count: 5,
-  dislikes_count: 3,
+  likes_count: 0,
+  dislikes_count: 0,
 });
 const chienArthur = new Pet({
   nom: "Arthur",
@@ -104,7 +117,7 @@ const chienArthur = new Pet({
   ],
   tags: [tagChien._id],
   spa_id: spaMorges._id,
-  likes_count: 80,
+  likes_count: 1,
   dislikes_count: 0,
 });
 const chienMerlan = new Pet({
@@ -119,7 +132,7 @@ const chienMerlan = new Pet({
   ],
   tags: [tagChien._id],
   spa_id: spaMorges._id,
-  likes_count: 80,
+  likes_count: 0,
   dislikes_count: 0,
 });
 const chienCookie = new Pet({
@@ -134,8 +147,8 @@ const chienCookie = new Pet({
   ],
   tags: [tagChien._id],
   spa_id: spaMorges._id,
-  likes_count: 8,
-  dislikes_count: 10,
+  likes_count: 0,
+  dislikes_count: 0,
 });
 const chienBat = new Pet({
   nom: "Bat",
@@ -149,8 +162,8 @@ const chienBat = new Pet({
   ],
   tags: [tagChien._id],
   spa_id: spaZurich._id,
-  likes_count: 80,
-  dislikes_count: 10,
+  likes_count: 0,
+  dislikes_count: 0,
 });
 const chienJoie = new Pet({
   nom: "Joie",
@@ -164,8 +177,8 @@ const chienJoie = new Pet({
   ],
   tags: [tagChien._id],
   spa_id: spaZurich._id,
-  likes_count: 20,
-  dislikes_count: 5,
+  likes_count: 0,
+  dislikes_count: 0,
 });
 const chienCaline = new Pet({
   nom: "Caline",
@@ -179,10 +192,32 @@ const chienCaline = new Pet({
   ],
   tags: [tagChien._id],
   spa_id: spaZurich._id,
-  likes_count: 20,
-  dislikes_count: 5,
+  likes_count: 1,
+  dislikes_count: 0,
 });
 
+const adoption = new Adoption({
+  date: new Date(),
+  user_id: userclient._id,
+  pet_id: chienArthur._id,
+  messages: [
+    {
+      content: "Je suis intéressé par l'adoption de ce chien.",
+      date: new Date(),
+      user_id: userclient._id,
+    },
+    {
+      content: "Merci pour votre intérêt. Nous allons examiner votre demande.",
+      date: new Date(),
+      user_id: userParis._id,
+    },
+  ],
+});
+userclient.likes = [chienArthur._id];
+// Supprimer toutes les collections existantes
+await mongoose.connection.dropDatabase();
+userParis.save();
+userclient.save();
 spaMorges.save();
 spaParis.save();
 spaZurich.save();
@@ -195,5 +230,8 @@ chienJoie.save();
 chienCaline.save();
 chienBeth.save();
 chienCara.save();
+adoption.save();
+
+
 chienToffee.save().then(() => console.log("Fini")).catch((error) => console.error("Erreur", error));
 
