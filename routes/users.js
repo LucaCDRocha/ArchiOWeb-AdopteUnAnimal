@@ -124,7 +124,13 @@ router.get("/:id/adoptions", authenticate, loadUserByRequestId, function (req, r
 
 router.get("/:id/likes", authenticate, loadUserByRequestId, function (req, res, next) {
 	User.findById(req.params.id)
-		.populate("likes")
+		.populate({
+			path: "likes",
+			populate: {
+				path: "tags",
+				model: "Tag"
+			}
+		})
 		.exec()
 		.then((user) => {
 			res.send(user.likes);
