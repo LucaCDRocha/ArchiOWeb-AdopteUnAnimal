@@ -7,7 +7,7 @@ import { authenticate } from "./auth.js";
 const router = express.Router();
 
 router.get("/", authenticate, function (req, res, next) {
-  Adoption.findOne({ user_id: req.currentUserId})
+  Adoption.find({ user_id: req.currentUserId})
     .populate("pet_id")
     .exec()
     .then((adoptions) => {
