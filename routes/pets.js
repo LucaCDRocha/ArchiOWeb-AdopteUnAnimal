@@ -17,7 +17,8 @@ router.get("/", authenticate, function (req, res, next) {
 			const excludedPets = [...user.likes, ...user.dislikes];
 			Pet.find({ _id: { $nin: excludedPets } })
 				.populate("tags")
-				.sort("dislikes_count")
+				.populate("spa_id")
+				.sort("-dislikes_count")
 				.exec()
 				.then((pets) => {
 					res.send(pets);
