@@ -130,7 +130,7 @@ const chienMerlan = new Pet({
 	],
 	tags: [tagChien._id],
 	spa_id: spaMorges._id,
-	likes_count: 0,
+	likes_count: 1,
 	dislikes_count: 0,
 });
 const chienCookie = new Pet({
@@ -212,7 +212,7 @@ const adoption = new Adoption({
 		},
 	],
 });
-userclient.likes = [chienArthur._id];
+userclient.likes = [chienArthur._id, chienCaline._id, chienMerlan._id];
 // Supprimer toutes les collections existantes
 await mongoose.connection.dropDatabase();
 userParis.save();

@@ -126,10 +126,16 @@ router.get("/:id/likes", authenticate, loadUserByRequestId, function (req, res, 
 	User.findById(req.params.id)
 		.populate({
 			path: "likes",
-			populate: {
-				path: "tags",
-				model: "Tag"
-			}
+			populate: [
+				{
+					path: "tags",
+					model: "Tag"
+				},
+				{
+					path: "spa_id",
+					model: "Spa"
+				}
+			]
 		})
 		.exec()
 		.then((user) => {
