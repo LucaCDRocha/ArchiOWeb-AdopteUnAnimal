@@ -212,6 +212,35 @@ const adoption = new Adoption({
 		},
 	],
 });
+
+const conversation2 = new Adoption({
+	date: new Date(),
+	user_id: userclient._id,
+	pet_id: chienCookie._id,
+	messages: [
+		{
+			content: "Bonjour, ce chiot est adorable, j'aimerais l'adopter.",
+			date: new Date(),
+			user_id: userclient._id,
+		},
+		{
+			content: "Bonjour, merci pour votre intérêt. Nous allons examiner votre demande.",
+			date: new Date(),
+			user_id: userParis._id,
+		},
+		{
+			content: "D'accord, savez-vous combien de temps ça prendra ?",
+			date: new Date(),
+			user_id: userclient._id,
+		},
+		{
+			content: "Nous vous répondrons dans les plus brefs délais, d'ici 1 à 2 jours.",
+			date: new Date(),
+			user_id: userParis._id,
+		},
+	],
+});
+
 userclient.likes = [chienArthur._id];
 // Supprimer toutes les collections existantes
 await mongoose.connection.dropDatabase();
@@ -230,6 +259,7 @@ chienCaline.save();
 chienBeth.save();
 chienCara.save();
 adoption.save();
+conversation2.save();
 
 chienToffee
 	.save()
