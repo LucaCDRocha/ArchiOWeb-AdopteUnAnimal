@@ -53,6 +53,12 @@ const spaZurich = new Spa({
 const tagChien = new Tag({
 	nom: "Chien",
 });
+const tagCaline = new Tag({
+	nom: "Caline",
+});
+const tagJoueur = new Tag({
+	nom: "Joueur",
+});
 
 const imageMorges = fs.readFileSync("Images/spaMorges_chien.jpg");
 const imageParis = fs.readFileSync("Images/spaParis_chien.jpg");
@@ -67,8 +73,16 @@ const chienToffee = new Pet({
 			data: imageParis,
 			imgType: "image/jpeg",
 		},
+		{
+			data: imageMorges,
+			imgType: "image/jpeg",
+		},
+		{
+			data: imageZurich,
+			imgType: "image/jpeg",
+		},
 	],
-	tags: [tagChien._id],
+	tags: [tagChien._id, tagCaline._id, tagJoueur._id],
 	spa_id: spaParis._id,
 	likes_count: 0,
 	dislikes_count: 0,
@@ -82,8 +96,16 @@ const chienCara = new Pet({
 			data: imageParis,
 			imgType: "image/jpeg",
 		},
+		{
+			data: imageMorges,
+			imgType: "image/jpeg",
+		},
+		{
+			data: imageZurich,
+			imgType: "image/jpeg",
+		},
 	],
-	tags: [tagChien._id],
+	tags: [tagChien._id, tagCaline._id, tagJoueur._id],
 	spa_id: spaParis._id,
 	likes_count: 0,
 	dislikes_count: 0,
@@ -97,8 +119,16 @@ const chienBeth = new Pet({
 			data: imageParis,
 			imgType: "image/jpeg",
 		},
+		{
+			data: imageMorges,
+			imgType: "image/jpeg",
+		},
+		{
+			data: imageZurich,
+			imgType: "image/jpeg",
+		},
 	],
-	tags: [tagChien._id],
+	tags: [tagChien._id, tagCaline._id, tagJoueur._id],
 	spa_id: spaParis._id,
 	likes_count: 0,
 	dislikes_count: 0,
@@ -112,8 +142,16 @@ const chienArthur = new Pet({
 			data: imageMorges,
 			imgType: "image/jpeg",
 		},
+		{
+			data: imageParis,
+			imgType: "image/jpeg",
+		},
+		{
+			data: imageZurich,
+			imgType: "image/jpeg",
+		},
 	],
-	tags: [tagChien._id],
+	tags: [tagChien._id, tagCaline._id, tagJoueur._id],
 	spa_id: spaMorges._id,
 	likes_count: 1,
 	dislikes_count: 0,
@@ -127,8 +165,16 @@ const chienMerlan = new Pet({
 			data: imageMorges,
 			imgType: "image/jpeg",
 		},
+		{
+			data: imageParis,
+			imgType: "image/jpeg",
+		},
+		{
+			data: imageZurich,
+			imgType: "image/jpeg",
+		},
 	],
-	tags: [tagChien._id],
+	tags: [tagChien._id, tagCaline._id, tagJoueur._id],
 	spa_id: spaMorges._id,
 	likes_count: 1,
 	dislikes_count: 0,
@@ -142,8 +188,16 @@ const chienCookie = new Pet({
 			data: imageMorges,
 			imgType: "image/jpeg",
 		},
+		{
+			data: imageParis,
+			imgType: "image/jpeg",
+		},
+		{
+			data: imageZurich,
+			imgType: "image/jpeg",
+		},
 	],
-	tags: [tagChien._id],
+	tags: [tagChien._id, tagCaline._id, tagJoueur._id],
 	spa_id: spaMorges._id,
 	likes_count: 0,
 	dislikes_count: 0,
@@ -157,8 +211,16 @@ const chienBat = new Pet({
 			data: imageZurich,
 			imgType: "image/jpeg",
 		},
+		{
+			data: imageParis,
+			imgType: "image/jpeg",
+		},
+		{
+			data: imageMorges,
+			imgType: "image/jpeg",
+		},
 	],
-	tags: [tagChien._id],
+	tags: [tagChien._id, tagCaline._id, tagJoueur._id],
 	spa_id: spaZurich._id,
 	likes_count: 0,
 	dislikes_count: 0,
@@ -172,8 +234,16 @@ const chienJoie = new Pet({
 			data: imageZurich,
 			imgType: "image/jpeg",
 		},
+		{
+			data: imageParis,
+			imgType: "image/jpeg",
+		},
+		{
+			data: imageMorges,
+			imgType: "image/jpeg",
+		},
 	],
-	tags: [tagChien._id],
+	tags: [tagChien._id, tagCaline._id, tagJoueur._id],
 	spa_id: spaZurich._id,
 	likes_count: 0,
 	dislikes_count: 0,
@@ -188,8 +258,16 @@ const chienCaline = new Pet({
 			data: imageZurich,
 			imgType: "image/jpeg",
 		},
+		{
+			data: imageParis,
+			imgType: "image/jpeg",
+		},
+		{
+			data: imageMorges,
+			imgType: "image/jpeg",
+		},
 	],
-	tags: [tagChien._id],
+	tags: [tagChien._id, tagCaline._id, tagJoueur._id],
 	spa_id: spaZurich._id,
 	likes_count: 1,
 	dislikes_count: 0,

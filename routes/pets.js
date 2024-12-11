@@ -16,6 +16,7 @@ router.get("/", authenticate, function (req, res, next) {
 			}
 			const excludedPets = [...user.likes, ...user.dislikes];
 			Pet.find({ _id: { $nin: excludedPets } })
+			.populate("spa_id")
 				.populate("tags")
 				.sort("dislikes_count")
 				.exec()
