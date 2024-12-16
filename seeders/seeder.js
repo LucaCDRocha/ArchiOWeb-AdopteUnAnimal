@@ -9,9 +9,14 @@ import bcrypt from "bcrypt";
 import * as config from "../config.js";
 import fs from "fs";
 import path from "path";
+import sharp from "sharp";
 
 // Connexion à la base de données
 mongoose.connect(config.databaseUrl);
+
+async function compressImage(imagePath) {
+	return await sharp(imagePath).resize(300).jpeg({ quality: 80 }).toBuffer();
+}
 
 const hashedPasswordParis = await bcrypt.hash("password123", config.bcryptCostFactor);
 const userParis = new User({
@@ -60,9 +65,9 @@ const tagJoueur = new Tag({
 	nom: "Joueur",
 });
 
-const imageMorges = fs.readFileSync("Images/spaMorges_chien.jpg");
-const imageParis = fs.readFileSync("Images/spaParis_chien.jpg");
-const imageZurich = fs.readFileSync("Images/spaZurich_chien.jpg");
+const imageMorges = await compressImage("Images/spaMorges_chien.jpg");
+const imageParis = await compressImage("Images/spaParis_chien.jpg");
+const imageZurich = await compressImage("Images/spaZurich_chien.jpg");
 
 const chienToffee = new Pet({
 	nom: "Toffee",
@@ -113,7 +118,7 @@ const chienCara = new Pet({
 const chienBeth = new Pet({
 	nom: "Bethany",
 	age: 10,
-	description: "Un chien très mignon qui a 10 ans. Très calme et affectueuse, adore jouer avec les enfants",
+	description: "Un chien très mignon qui a 10 ans. Tr��s calme et affectueuse, adore jouer avec les enfants",
 	images: [
 		{
 			data: imageParis,
