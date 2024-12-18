@@ -14,6 +14,7 @@ import usersRouter from "./routes/users.js";
 import petsRouter from "./routes/pets.js";
 import spasRouter from "./routes/spas.js";
 import adoptionsRouter from "./routes/adoptions.js";
+import tagsRouter from "./routes/tags.js";
 
 const app = express();
 // Parse the OpenAPI document.
@@ -33,6 +34,7 @@ app.use("/users", usersRouter);
 app.use("/pets", petsRouter);
 app.use("/spas", spasRouter);
 app.use("/adoptions", adoptionsRouter);
+app.use("/tags", tagsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
