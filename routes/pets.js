@@ -15,7 +15,7 @@ router.get("/", authenticate, function (req, res, next) {
 				return res.status(404).send("User not found");
 			}
 			const excludedPets = [...user.likes, ...user.dislikes];
-			const tagFilter = req.query.tags ? { tags: { $in: req.query.tags.split(",") } } : {};
+			const tagFilter = req.query.tags ? { tags: { $all: req.query.tags.split(",") } } : {};
 			Pet.find({ _id: { $nin: excludedPets }, ...tagFilter })
 				.populate("spa_id")
 				.populate("tags")
