@@ -58,16 +58,35 @@ const spaZurich = new Spa({
 const tagChien = new Tag({
 	nom: "Chien",
 });
-const tagCaline = new Tag({
-	nom: "Caline",
+const tagChat = new Tag({
+	nom: "Chat",
+});
+const tagLapin = new Tag({
+	nom: "Lapin",
 });
 const tagJoueur = new Tag({
 	nom: "Joueur",
 });
+const tagTurbulant = new Tag({
+	nom: "Turbulant",
+});
+const tagCalme = new Tag({
+	nom: "Calme",
+});
+const tagCurieux = new Tag({
+	nom: "Curieux",
+});
+
 
 const imageMorges = await compressImage("Images/spaMorges_chien.jpg");
 const imageParis = await compressImage("Images/spaParis_chien.jpg");
 const imageZurich = await compressImage("Images/spaZurich_chien.jpg");
+const imageChatKira = await compressImage("Images/chatKira.jpg");
+const imageChatGouttiere = await compressImage("Images/chat-de-gouttiere.jpg");
+const imageChaton = await compressImage("Images/chaton.jpg");
+const imageLapin = await compressImage("Images/lapin.jpg");
+const imageLapinou = await compressImage("Images/lapinou.jpeg");
+
 
 const chienToffee = new Pet({
 	nom: "Toffee",
@@ -87,7 +106,7 @@ const chienToffee = new Pet({
 			imgType: "image/jpeg",
 		},
 	],
-	tags: [tagChien._id, tagCaline._id, tagJoueur._id],
+	tags: [tagChien._id, tagJoueur._id],
 	spa_id: spaParis._id,
 	likes_count: 0,
 	dislikes_count: 0,
@@ -110,7 +129,7 @@ const chienCara = new Pet({
 			imgType: "image/jpeg",
 		},
 	],
-	tags: [tagChien._id, tagCaline._id, tagJoueur._id],
+	tags: [tagChien._id, tagJoueur._id],
 	spa_id: spaParis._id,
 	likes_count: 0,
 	dislikes_count: 0,
@@ -118,7 +137,7 @@ const chienCara = new Pet({
 const chienBeth = new Pet({
 	nom: "Bethany",
 	age: 10,
-	description: "Un chien très mignon qui a 10 ans. Tr��s calme et affectueuse, adore jouer avec les enfants",
+	description: "Un chien très mignon qui a 10 ans. Très calme et affectueuse, adore jouer avec les enfants",
 	images: [
 		{
 			data: imageParis,
@@ -133,7 +152,7 @@ const chienBeth = new Pet({
 			imgType: "image/jpeg",
 		},
 	],
-	tags: [tagChien._id, tagCaline._id, tagJoueur._id],
+	tags: [tagChien._id, tagJoueur._id],
 	spa_id: spaParis._id,
 	likes_count: 0,
 	dislikes_count: 0,
@@ -156,7 +175,7 @@ const chienArthur = new Pet({
 			imgType: "image/jpeg",
 		},
 	],
-	tags: [tagChien._id, tagCaline._id, tagJoueur._id],
+	tags: [tagChien._id, tagJoueur._id],
 	spa_id: spaMorges._id,
 	likes_count: 1,
 	dislikes_count: 0,
@@ -179,7 +198,7 @@ const chienMerlan = new Pet({
 			imgType: "image/jpeg",
 		},
 	],
-	tags: [tagChien._id, tagCaline._id, tagJoueur._id],
+	tags: [tagChien._id, tagJoueur._id],
 	spa_id: spaMorges._id,
 	likes_count: 1,
 	dislikes_count: 0,
@@ -202,7 +221,7 @@ const chienCookie = new Pet({
 			imgType: "image/jpeg",
 		},
 	],
-	tags: [tagChien._id, tagCaline._id, tagJoueur._id],
+	tags: [tagChien._id, tagJoueur._id],
 	spa_id: spaMorges._id,
 	likes_count: 0,
 	dislikes_count: 0,
@@ -225,7 +244,7 @@ const chienBat = new Pet({
 			imgType: "image/jpeg",
 		},
 	],
-	tags: [tagChien._id, tagCaline._id, tagJoueur._id],
+	tags: [tagChien._id, tagJoueur._id],
 	spa_id: spaZurich._id,
 	likes_count: 0,
 	dislikes_count: 0,
@@ -248,7 +267,7 @@ const chienJoie = new Pet({
 			imgType: "image/jpeg",
 		},
 	],
-	tags: [tagChien._id, tagCaline._id, tagJoueur._id],
+	tags: [tagChien._id, tagJoueur._id],
 	spa_id: spaZurich._id,
 	likes_count: 0,
 	dislikes_count: 0,
@@ -272,10 +291,117 @@ const chienCaline = new Pet({
 			imgType: "image/jpeg",
 		},
 	],
-	tags: [tagChien._id, tagCaline._id, tagJoueur._id],
+	tags: [tagChien._id, tagJoueur._id],
 	spa_id: spaZurich._id,
 	likes_count: 1,
 	dislikes_count: 0,
+});
+const chatKira = new Pet({
+	nom: "Kira",
+	age: 3,
+	description: "Une chatte toute mignonne qui a 2 ans. Elle est très calme et adore les câlins.",
+	images: [
+		{
+			data: imageChatKira,
+			imgType: "image/jpeg",
+		},
+		{
+			data: imageChatGouttiere,
+			imgType: "image/jpeg",
+		},
+		{
+			data: imageChaton,
+			imgType: "image/jpeg",
+		},
+	],
+	tags: [tagChat._id, tagCalme._id],
+	spa_id: spaParis._id,
+	likes_count: 2,
+	dislikes_count: 0,
+});
+const chatPito = new Pet({
+	nom: "Pito",
+	age: 8,
+	description: "Un chat très mignon qui a 8 ans. Il est très joueur et curieux.",
+	images: [
+		{
+			data: imageChatGouttiere,
+			imgType: "image/jpeg",
+		},
+		{
+			data: imageChatGouttiere,
+			imgType: "image/jpeg",
+		},
+		{
+			data: imageChaton,
+			imgType: "image/jpeg",
+		},
+	],
+	tags: [tagChat._id, tagJoueur._id, tagCurieux._id, tagTurbulant._id],
+	spa_id: spaMorges._id,
+	likes_count: 1,
+	dislikes_count: 3,
+});
+const chatMojito = new Pet({
+	nom: "Mojito",
+	age: 1,
+	description: "Un chaton de tout juste une année qui veut être aimée et être caressée.",
+	images: [
+		{
+			data: imageChaton,
+			imgType: "image/jpeg",
+		},
+		{
+			data: imageChatGouttiere,
+			imgType: "image/jpeg",
+		},
+		{
+			data: imageChatKira,
+			imgType: "image/jpeg",
+		},
+	],
+	tags: [tagChat._id, tagCalme],
+	spa_id: spaMorges._id,
+	likes_count: 3,
+	dislikes_count: 0,
+});
+const lapinJojo = new Pet({
+	nom: "Jojo",
+	age: 2,
+	description: "Un lapin très mignon qui a 2 ans. Il est très joueur et curieux.",
+	images: [
+		{
+			data: imageLapin,
+			imgType: "image/jpeg",
+		},
+		{
+			data: imageLapinou,
+			imgType: "image/jpeg",
+		},
+	],
+	tags: [tagChat._id, tagTurbulant, tagCurieux._id],
+	spa_id: spaParis._id,
+	likes_count: 1,
+	dislikes_count: 1,
+});
+const lapinRoger = new Pet({
+	nom: "Roger",
+	age: 1,
+	description: "Un lapin très mignon qui a 1 ans. Il est très joueur et curieux.",
+	images: [
+		{
+			data: imageLapinou,
+			imgType: "image/jpeg",
+		},
+		{
+			data: imageLapin,
+			imgType: "image/jpeg",
+		},
+	],
+	tags: [tagChat._id, tagJoueur, tagCurieux._id],
+	spa_id: spaZurich._id,
+	likes_count: 2,
+	dislikes_count: 1,
 });
 
 const adoption = new Adoption({
@@ -333,6 +459,12 @@ spaMorges.save();
 spaParis.save();
 spaZurich.save();
 tagChien.save();
+tagChat.save();
+tagLapin.save();
+tagJoueur.save();
+tagTurbulant.save();
+tagCalme.save();
+tagCurieux.save();
 chienArthur.save();
 chienMerlan.save();
 chienCookie.save();
@@ -341,6 +473,11 @@ chienJoie.save();
 chienCaline.save();
 chienBeth.save();
 chienCara.save();
+chatKira.save();
+chatPito.save();
+chatMojito.save();
+lapinJojo.save();
+lapinRoger.save();
 adoption.save();
 conversation2.save();
 
