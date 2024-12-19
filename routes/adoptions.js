@@ -8,7 +8,15 @@ const router = express.Router();
 
 router.get("/", authenticate, function (req, res, next) {
   Adoption.find({ user_id: req.currentUserId})
-    .populate("pet_id")
+    .populate({
+			path: "pet_id",
+			populate: [
+				{
+					path: "spa_id",
+					model: "Spa"
+				}
+			]
+		})
     .exec()
     .then((adoptions) => {
       res.send(adoptions);
