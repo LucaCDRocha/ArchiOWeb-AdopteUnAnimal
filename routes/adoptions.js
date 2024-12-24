@@ -7,15 +7,23 @@ import { authenticate } from "../middleware/auth.js";
 const router = express.Router();
 
 router.get("/", authenticate, function (req, res, next) {
-	Adoption.find({ user_id: req.currentUserId })
-		.populate("pet_id")
-		.exec()
-		.then((adoptions) => {
-			res.send(adoptions);
+  Adoption.find({ user_id: req.currentUserId})
+    .populate({
+			path: "pet_id",
+			populate: [
+				{
+					path: "spa_id",
+					model: "Spa"
+				}
+			]
 		})
-		.catch((err) => {
-			next(err);
-		});
+    .exec()
+    .then((adoptions) => {
+      res.send(adoptions);
+    })
+    .catch((err) => {
+      next(err);
+    });
 });
 
 router.post("/", function (req, res, next) {
