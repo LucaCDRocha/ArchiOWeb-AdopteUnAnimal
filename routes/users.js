@@ -5,7 +5,8 @@ import { promisify } from "util";
 
 import * as config from "../config.js";
 import User from "../models/user.js";
-import { authenticate } from "./auth.js";
+import { authenticate } from "../middleware/auth.js";
+import { loadUserByRequestId } from "../middleware/user.js";
 import Adoption from "../models/adoption.js";
 import Pet from "../models/pet.js";
 
@@ -89,16 +90,6 @@ router.put("/:id", authenticate, loadUserByRequestId, async function (req, res, 
 	}
 });
 
-async function loadUserByRequestId(req, res, next) {
-	const user = await User.findById(req.params.id);
-	if (user === null) {
-		return res.sendStatus(404);
-	}
-
-	req.user = user;
-	next();
-}
-
 router.delete("/:id", authenticate, loadUserByRequestId, async function (req, res, next) {
 	if (req.currentUserId !== req.params.id) {
 		return res.sendStatus(403); // Forbidden
@@ -129,13 +120,13 @@ router.get("/:id/likes", authenticate, loadUserByRequestId, function (req, res, 
 			populate: [
 				{
 					path: "tags",
-					model: "Tag"
+					model: "Tag",
 				},
 				{
 					path: "spa_id",
-					model: "Spa"
-				}
-			]
+					model: "Spa",
+				},
+			],
 		})
 		.exec()
 		.then((user) => {

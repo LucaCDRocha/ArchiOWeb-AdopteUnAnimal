@@ -1,9 +1,10 @@
 import express from "express";
 import Pet from "../models/pet.js";
 import User from "../models/user.js";
-import { authenticate } from "./auth.js";
+import { authenticate } from "../middleware/auth.js";
+import { checkSpaLink } from "../middleware/user.js";
 import Tag from "../models/tag.js";
-import Spa from "../models/spa.js";
+import Spa from "../models/spa.js"; // Ensure this path is correct
 
 const router = express.Router();
 
@@ -49,8 +50,13 @@ router.get("/:id", authenticate, function (req, res, next) {
 		});
 });
 
-router.post("/", authenticate, function (req, res, next) {
-	const newPet = new Pet(req.body);
+router.post("/", authenticate, checkSpaLink, function (req, res, next) {
+	const newPet = new Pet({
+		...req.body,
+		spa_id: req.spa._id,
+		likes_count: 0,
+		dislikes_count: 0,
+	});
 	newPet
 		.save()
 		.then((pet) => {
@@ -60,6 +66,7 @@ router.post("/", authenticate, function (req, res, next) {
 			next(err);
 		});
 });
+
 router.patch("/:id", authenticate, function (req, res, next) {
 	Pet.findByIdAndUpdate(req.params.id, req.body, { new: true })
 		.exec()
