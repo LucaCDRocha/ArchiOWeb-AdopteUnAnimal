@@ -67,7 +67,7 @@ router.post("/", authenticate, checkSpaLink, function (req, res, next) {
 		});
 });
 
-router.patch("/:id", authenticate, function (req, res, next) {
+router.put("/:id", authenticate, function (req, res, next) {
 	Pet.findByIdAndUpdate(req.params.id, req.body, { new: true })
 		.exec()
 		.then((pet) => {
