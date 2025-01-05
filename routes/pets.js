@@ -67,7 +67,7 @@ router.post("/", authenticate, checkSpaLink, function (req, res, next) {
 		});
 });
 
-router.put("/:id", authenticate, function (req, res, next) {
+router.put("/:id", authenticate, checkSpaLink, function (req, res, next) {
 	Pet.findByIdAndUpdate(req.params.id, req.body, { new: true })
 		.exec()
 		.then((pet) => {
@@ -81,7 +81,7 @@ router.put("/:id", authenticate, function (req, res, next) {
 		});
 });
 
-router.delete("/:id", authenticate, function (req, res, next) {
+router.delete("/:id", authenticate, checkSpaLink, function (req, res, next) {
 	Pet.findByIdAndDelete(req.params.id)
 		.exec()
 		.then((pet) => {
