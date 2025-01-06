@@ -51,7 +51,7 @@ router.post("/", function (req, res, next) {
 			const newUser = new User(req.body);
 
 			return newUser.save().then((savedUser) => {
-				res.send(savedUser);
+				res.status(201).send(savedUser);
 			});
 		})
 		.catch((err) => {
