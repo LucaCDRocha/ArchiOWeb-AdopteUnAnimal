@@ -9,6 +9,7 @@ import { authenticate } from "../middleware/auth.js";
 import { loadUserByRequestId } from "../middleware/user.js";
 import Adoption from "../models/adoption.js";
 import Pet from "../models/pet.js";
+import Spa from "../models/spa.js";
 
 const signJwt = promisify(jwt.sign);
 
@@ -154,8 +155,10 @@ router.post("/login", function (req, res, next) {
 				if (!valid) return res.sendStatus(401); // Unauthorized
 				// Login is valid...
 				const exp = Math.floor(Date.now() / 1000 + 60 * 60 * 24);
-				return signJwt({ sub: user._id, exp: exp }, config.secret).then((token) => {
-					res.send({ message: `Welcome ${user.email}!`, token });
+				return signJwt({ sub: user._id, exp: exp }, config.secret).then(async (token) => {
+					const spa = await Spa.findOne({ user_id: user._id }).exec()
+					const hasSpa = !!spa;
+					res.send({ message: `Welcome ${user.email}!`, token, hasSpa });
 				});
 			});
 		})
