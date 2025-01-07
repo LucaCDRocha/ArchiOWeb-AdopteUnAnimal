@@ -1,23 +1,10 @@
 import express from "express";
-import { authenticate } from "./auth.js";
+import { authenticate } from "../middleware/auth.js";
+import { loadSpaByRequestId } from "../middleware/spa.js";
 import Spa from "../models/spa.js";
 import Pet from "../models/pet.js";
 
 const router = express.Router();
-
-// Middleware to load Spa by request ID
-async function loadSpaByRequestId(req, res, next) {
-	try {
-		const spa = await Spa.findById(req.params.id).exec();
-		if (!spa) {
-			return res.status(404).send("Spa not found");
-		}
-		req.spa = spa;
-		next();
-	} catch (err) {
-		next(err);
-	}
-}
 
 router.get("/", function (req, res, next) {
 	Spa.find()

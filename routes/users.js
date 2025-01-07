@@ -5,9 +5,11 @@ import { promisify } from "util";
 
 import * as config from "../config.js";
 import User from "../models/user.js";
-import { authenticate } from "./auth.js";
+import { authenticate } from "../middleware/auth.js";
+import { loadUserByRequestId } from "../middleware/user.js";
 import Adoption from "../models/adoption.js";
 import Pet from "../models/pet.js";
+import Spa from "../models/spa.js";
 
 const signJwt = promisify(jwt.sign);
 
@@ -89,16 +91,6 @@ router.put("/:id", authenticate, loadUserByRequestId, async function (req, res, 
 	}
 });
 
-async function loadUserByRequestId(req, res, next) {
-	const user = await User.findById(req.params.id);
-	if (user === null) {
-		return res.sendStatus(404);
-	}
-
-	req.user = user;
-	next();
-}
-
 router.delete("/:id", authenticate, loadUserByRequestId, async function (req, res, next) {
 	if (req.currentUserId !== req.params.id) {
 		return res.sendStatus(403); // Forbidden
@@ -124,7 +116,19 @@ router.get("/:id/adoptions", authenticate, loadUserByRequestId, function (req, r
 
 router.get("/:id/likes", authenticate, loadUserByRequestId, function (req, res, next) {
 	User.findById(req.params.id)
-		.populate("likes")
+		.populate({
+			path: "likes",
+			populate: [
+				{
+					path: "tags",
+					model: "Tag",
+				},
+				{
+					path: "spa_id",
+					model: "Spa",
+				},
+			],
+		})
 		.exec()
 		.then((user) => {
 			res.send(user.likes);
@@ -151,8 +155,10 @@ router.post("/login", function (req, res, next) {
 				if (!valid) return res.sendStatus(401); // Unauthorized
 				// Login is valid...
 				const exp = Math.floor(Date.now() / 1000 + 60 * 60 * 24);
-				return signJwt({ sub: user._id, exp: exp }, config.secret).then((token) => {
-					res.send({ message: `Welcome ${user.email}!`, token });
+				return signJwt({ sub: user._id, exp: exp }, config.secret).then(async (token) => {
+					const spa = await Spa.findOne({ user_id: user._id }).exec()
+					const hasSpa = !!spa;
+					res.send({ message: `Welcome ${user.email}!`, token, hasSpa });
 				});
 			});
 		})
