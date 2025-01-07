@@ -4,6 +4,7 @@ import { cleanUpDatabase } from "./utils.specs.js";
 import User from "../models/user.js";
 import bcrypt from "bcrypt";
 import * as config from "../config.js";
+import mongoose from "mongoose";
 
 let superUser;
 let superUserToken;
@@ -32,6 +33,12 @@ beforeEach(async () => {
 	// console.log("--------------------ICI--------------------");
 
 	// console.log(loginRes.body);
+});
+
+afterAll(async () => {
+	await cleanUpDatabase();
+	// close the database connection
+	await mongoose.connection.close();
 });
 
 describe("Users API, get user", () => {
