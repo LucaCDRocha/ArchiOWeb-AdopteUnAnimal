@@ -23,7 +23,7 @@ router.get("/", authenticate, function (req, res, next) {
 				.sort("-dislikes_count")
 				.exec()
 				.then((pets) => {
-					res.send(pets);
+					res.status(200).send(pets);
 				})
 				.catch((err) => {
 					next(err);
@@ -43,7 +43,7 @@ router.get("/:id", authenticate, function (req, res, next) {
 			if (!pet) {
 				return res.status(404).send("Pet not found");
 			}
-			res.send(pet);
+			res.status(200).send(pet);
 		})
 		.catch((err) => {
 			next(err);
@@ -74,7 +74,7 @@ router.put("/:id", authenticate, checkSpaLink, function (req, res, next) {
 			if (!pet) {
 				return res.status(404).send("Pet not found");
 			}
-			res.send(pet);
+			res.status(200).send(pet);
 		})
 		.catch((err) => {
 			next(err);
@@ -88,7 +88,7 @@ router.delete("/:id", authenticate, checkSpaLink, function (req, res, next) {
 			if (!pet) {
 				return res.status(404).send("Pet not found");
 			}
-			res.send("Pet deleted successfully");
+			res.status(200).send("Pet deleted successfully");
 		})
 		.catch((err) => {
 			next(err);
@@ -105,7 +105,7 @@ router.put("/:id/like", authenticate, function (req, res, next) {
 			User.findByIdAndUpdate(req.currentUserId, { $addToSet: { likes: pet._id } }, { new: true })
 				.exec()
 				.then((user) => {
-					res.send(pet);
+					res.status(200).send(pet);
 				})
 				.catch((err) => {
 					next(err);
@@ -126,7 +126,7 @@ router.delete("/:id/like", authenticate, function (req, res, next) {
 			User.findByIdAndUpdate(req.currentUserId, { $pull: { likes: pet._id } }, { new: true })
 				.exec()
 				.then((user) => {
-					res.send(pet);
+					res.status(200).send(pet);
 				})
 				.catch((err) => {
 					next(err);
@@ -147,7 +147,7 @@ router.put("/:id/dislike", authenticate, function (req, res, next) {
 			User.findByIdAndUpdate(req.currentUserId, { $addToSet: { dislikes: pet._id } }, { new: true })
 				.exec()
 				.then((user) => {
-					res.send(pet);
+					res.status(200).send(pet);
 				})
 				.catch((err) => {
 					next(err);
@@ -168,7 +168,7 @@ router.delete("/:id/dislike", authenticate, function (req, res, next) {
 			User.findByIdAndUpdate(req.currentUserId, { $pull: { dislikes: pet._id } }, { new: true })
 				.exec()
 				.then((user) => {
-					res.send(pet);
+					res.status(200).send(pet);
 				})
 				.catch((err) => {
 					next(err);

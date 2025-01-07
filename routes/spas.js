@@ -11,16 +11,16 @@ router.get("/", function (req, res, next) {
 		.sort("nom")
 		.exec()
 		.then((spas) => {
-			res.send(spas);
+			res.status(200).send(spas);
 		})
 		.catch((err) => {
 			next(err);
 		});
 });
 
-router.get("/:id", loadSpaByRequestId, function (req, res) {
+router.get("/:id", loadSpaByRequestId, function (req, res, next) {
 	try {
-		res.send(req.spa);
+		res.status(200).send(req.spa);
 	} catch (err) {
 		next(err);
 	}
@@ -38,26 +38,26 @@ router.post("/", function (req, res, next) {
 		});
 });
 
-router.get("/:id/pets", loadSpaByRequestId, function (req, res) {
+router.get("/:id/pets", loadSpaByRequestId, function (req, res, next) {
 	Pet.find({ spa_id: req.spa._id })
 		.sort("name")
 		.exec()
 		.then((pets) => {
-			res.send(pets);
+			res.status(200).send(pets);
 		})
 		.catch((err) => {
 			next(err);
 		});
 });
 
-router.put("/:id", loadSpaByRequestId, async function (req, res) {
+router.put("/:id", loadSpaByRequestId, async function (req, res, next) {
 	const spa = req.spa;
 	spa.nom = req.body.nom;
 	spa.addresse = req.body.addresse;
 
 	try {
 		const updatedSpa = await spa.save();
-		res.send(updatedSpa);
+		res.status(200).send(updatedSpa);
 	} catch (err) {
 		if (err.code === 11000) {
 			res.status(409).send("Spa name already exists");
@@ -66,7 +66,7 @@ router.put("/:id", loadSpaByRequestId, async function (req, res) {
 	}
 });
 
-router.delete("/:id", loadSpaByRequestId, async function (req, res) {
+router.delete("/:id", loadSpaByRequestId, async function (req, res, next) {
 	try {
 		await req.spa.deleteOne();
 		res.sendStatus(204); // No Content
