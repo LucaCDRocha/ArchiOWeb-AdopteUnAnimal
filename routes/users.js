@@ -6,7 +6,7 @@ import { promisify } from "util";
 import * as config from "../config.js";
 import User from "../models/user.js";
 import { authenticate } from "../middleware/auth.js";
-import { loadUserByRequestId } from "../middleware/user.js";
+import { checkSpaLink, loadUserByRequestId } from "../middleware/user.js";
 import Adoption from "../models/adoption.js";
 import Pet from "../models/pet.js";
 
@@ -160,6 +160,11 @@ router.post("/login", function (req, res, next) {
 			});
 		})
 		.catch(next);
+});
+
+router.get("/:id/spa", authenticate, checkSpaLink, function (req, res, next) {
+
+res.send(req.spa);
 });
 
 export default router;
