@@ -25,12 +25,16 @@ router.get("/", authenticate, function (req, res, next) {
 				.exec()
 				.then((pets) => {
 					const { latitude, longitude } = req.query;
-					const sortedPets = pets.sort((a, b) => {
-						const distanceA = calculateDistance({ latitude, longitude }, a.spa_id);
-						const distanceB = calculateDistance({ latitude, longitude }, b.spa_id);
-						return distanceA - distanceB;
-					});
-					res.status(200).send(sortedPets);
+					if (latitude && longitude) {
+						const sortedPets = pets.sort((a, b) => {
+							const distanceA = calculateDistance({ latitude, longitude }, a.spa_id);
+							const distanceB = calculateDistance({ latitude, longitude }, b.spa_id);
+							return distanceA - distanceB;
+						});
+						res.status(200).send(sortedPets);
+					} else {
+						res.status(200).send(pets);
+					}
 				})
 				.catch((err) => {
 					next(err);
