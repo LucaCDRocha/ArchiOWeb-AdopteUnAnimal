@@ -9,58 +9,51 @@ import { authenticate } from "../middleware/auth.js";
 import { checkSpaLink, loadUserByRequestId } from "../middleware/user.js";
 import Adoption from "../models/adoption.js";
 import Pet from "../models/pet.js";
+import Spa from "../models/spa.js";
 
 const signJwt = promisify(jwt.sign);
 
 const router = express.Router();
 
-router.get("/", authenticate, function (req, res, next) {
-	User.find()
-		.sort("firstName")
-		.exec()
-		.then((users) => {
-			res.send(users);
-		})
-		.catch((err) => {
-			next(err);
-		});
-});
-
-router.get("/isAuthenticated", authenticate, function (req, res, next) {
+router.get("/", authenticate, async (req, res, next) => {
 	try {
-		res.send({ isAuthenticated: true });
+		const users = await User.find().sort("firstName").exec();
+		res.status(200).send(users);
 	} catch (err) {
 		next(err);
 	}
 });
 
-router.get("/:id", authenticate, loadUserByRequestId, function (req, res, next) {
+router.get("/isAuthenticated", authenticate, (req, res, next) => {
 	try {
-		res.send(req.user);
+		res.status(200).send({ isAuthenticated: true });
 	} catch (err) {
 		next(err);
 	}
 });
 
-router.post("/", function (req, res, next) {
-	const plainTextPassword = req.body.password;
-
-	bcrypt
-		.hash(plainTextPassword, config.bcryptCostFactor)
-		.then((hash) => {
-			req.body.password = hash;
-			const newUser = new User(req.body);
-
-			return newUser.save().then((savedUser) => {
-				res.send(savedUser);
-			});
-		})
-		.catch((err) => {
-			next(err);
-		});
+router.get("/:id", authenticate, loadUserByRequestId, (req, res, next) => {
+	try {
+		res.status(200).send(req.user);
+	} catch (err) {
+		next(err);
+	}
 });
 
-router.put("/:id", authenticate, loadUserByRequestId, async function (req, res, next) {
+router.post("/", async (req, res, next) => {
+	try {
+		const plainTextPassword = req.body.password;
+		const hash = await bcrypt.hash(plainTextPassword, config.bcryptCostFactor);
+		req.body.password = hash;
+		const newUser = new User(req.body);
+		const savedUser = await newUser.save();
+		res.status(201).send(savedUser);
+	} catch (err) {
+		next(err);
+	}
+});
+
+router.put("/:id", authenticate, loadUserByRequestId, async (req, res, next) => {
 	if (req.currentUserId !== req.params.id) {
 		return res.sendStatus(403); // Forbidden
 	}
@@ -80,7 +73,7 @@ router.put("/:id", authenticate, loadUserByRequestId, async function (req, res, 
 
 	try {
 		await user.save();
-		res.send(user);
+		res.status(200).send(user);
 	} catch (err) {
 		if (err.code === 11000) {
 			// Duplicate key error
@@ -90,7 +83,7 @@ router.put("/:id", authenticate, loadUserByRequestId, async function (req, res, 
 	}
 });
 
-router.delete("/:id", authenticate, loadUserByRequestId, async function (req, res, next) {
+router.delete("/:id", authenticate, loadUserByRequestId, async (req, res, next) => {
 	if (req.currentUserId !== req.params.id) {
 		return res.sendStatus(403); // Forbidden
 	}
@@ -103,63 +96,55 @@ router.delete("/:id", authenticate, loadUserByRequestId, async function (req, re
 	}
 });
 
-router.get("/:id/adoptions", authenticate, loadUserByRequestId, function (req, res, next) {
-	User.findById(req.params.id)
-		.populate("adoptions")
-		.exec()
-		.then((user) => {
-			res.send(user.adoptions);
-		})
-		.catch(next);
+router.get("/:id/adoptions", authenticate, loadUserByRequestId, async (req, res, next) => {
+	try {
+		const user = await User.findById(req.params.id).populate("adoptions").exec();
+		res.status(200).send(user.adoptions);
+	} catch (err) {
+		next(err);
+	}
 });
 
-router.get("/:id/likes", authenticate, loadUserByRequestId, function (req, res, next) {
-	User.findById(req.params.id)
-		.populate({
+router.get("/:id/likes", authenticate, loadUserByRequestId, async (req, res, next) => {
+	try {
+		const user = await User.findById(req.params.id).populate({
 			path: "likes",
 			populate: [
-				{
-					path: "tags",
-					model: "Tag",
-				},
-				{
-					path: "spa_id",
-					model: "Spa",
-				},
+				{ path: "tags", model: "Tag" },
+				{ path: "spa_id", model: "Spa" },
 			],
-		})
-		.exec()
-		.then((user) => {
-			res.send(user.likes);
-		})
-		.catch(next);
+		}).exec();
+		res.status(200).send(user.likes);
+	} catch (err) {
+		next(err);
+	}
 });
 
-router.get("/:id/dislikes", authenticate, loadUserByRequestId, function (req, res, next) {
-	User.findById(req.params.id)
-		.populate("dislikes")
-		.exec()
-		.then((user) => {
-			res.send(user.dislikes);
-		})
-		.catch(next);
+router.get("/:id/dislikes", authenticate, loadUserByRequestId, async (req, res, next) => {
+	try {
+		const user = await User.findById(req.params.id).populate("dislikes").exec();
+		res.status(200).send(user.dislikes);
+	} catch (err) {
+		next(err);
+	}
 });
 
-router.post("/login", function (req, res, next) {
-	User.findOne({ email: req.body.email })
-		.exec()
-		.then((user) => {
-			if (!user) return res.sendStatus(401); // Unauthorized
-			return bcrypt.compare(req.body.password, user.password).then((valid) => {
-				if (!valid) return res.sendStatus(401); // Unauthorized
-				// Login is valid...
-				const exp = Math.floor(Date.now() / 1000 + 60 * 60 * 24);
-				return signJwt({ sub: user._id, exp: exp }, config.secret).then((token) => {
-					res.send({ message: `Welcome ${user.email}!`, token });
-				});
-			});
-		})
-		.catch(next);
+router.post("/login", async (req, res, next) => {
+	try {
+		const user = await User.findOne({ email: req.body.email }).exec();
+		if (!user) return res.sendStatus(401); // Unauthorized
+
+		const valid = await bcrypt.compare(req.body.password, user.password);
+		if (!valid) return res.sendStatus(401); // Unauthorized
+
+		const exp = Math.floor(Date.now() / 1000 + 60 * 60 * 24);
+		const token = await signJwt({ sub: user._id, exp: exp }, config.secret);
+		const spa = await Spa.findOne({ user_id: user._id }).exec();
+		const hasSpa = !!spa;
+		res.status(200).send({ message: `Welcome ${user.email}!`, token, hasSpa });
+	} catch (err) {
+		next(err);
+	}
 });
 
 router.get("/:id/spa", authenticate, checkSpaLink, function (req, res, next) {

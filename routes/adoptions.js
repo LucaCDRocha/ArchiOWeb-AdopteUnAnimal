@@ -19,7 +19,7 @@ router.get("/", authenticate, function (req, res, next) {
 		})
     .exec()
     .then((adoptions) => {
-      res.send(adoptions);
+      res.status(200).send(adoptions);
     })
     .catch((err) => {
       next(err);
@@ -47,7 +47,7 @@ router.get("/:id", authenticate, function (req, res, next) {
 			if (!adoption) {
 				return res.status(404).send("Adoption not found");
 			}
-			res.send(adoption);
+			res.status(200).send(adoption);
 		})
 		.catch((err) => {
 			next(err);
@@ -61,7 +61,7 @@ router.delete("/:id", authenticate, function (req, res, next) {
 			if (!adoption) {
 				return res.status(404).send("Adoption not found");
 			}
-			res.send("Adoption deleted successfully");
+			res.status(200).send("Adoption deleted successfully");
 		})
 		.catch((err) => {
 			next(err);
@@ -76,7 +76,7 @@ router.get("/:id/messages", authenticate, function (req, res, next) {
 			if (!adoption) {
 				return res.status(404).send("Adoption not found");
 			}
-			res.send(adoption.messages);
+			res.status(200).send(adoption.messages);
 		})
 		.catch((err) => {
 			next(err);
@@ -113,7 +113,7 @@ router.delete("/:id/messages/:msg_id", authenticate, function (req, res, next) {
 			}
 			adoption.messages.splice(messageIndex, 1);
 			return adoption.save().then((updatedAdoption) => {
-				res.send(updatedAdoption.messages);
+				res.status(200).send(updatedAdoption.messages);
 			});
 		})
 		.catch((err) => {
