@@ -19,7 +19,7 @@ async function compressImage(imagePath) {
 }
 
 const hashedPasswordParis = await bcrypt.hash("password123", config.bcryptCostFactor);
-const userParis = new User({
+const userYverdon = new User({
 	firstName: "Jane",
 	lastName: "Doe",
 	email: "jane.doe@example.com",
@@ -33,26 +33,26 @@ const userclient = new User({
 	email: "john.doe@example.com",
 	password: hashedPasswordClient,
 });
-const spaParis = new Spa({
+const spaYverdon = new Spa({
 	nom: "SPA de Paris",
 	adresse: "Paris",
-	latitude: 567,
-	longitude: 1235,
-	user_id: userParis._id,
+	latitude: 46.46514,
+	longitude: 6.38484,
+	user_id: userYverdon._id,
 });
 
 const spaMorges = new Spa({
 	nom: "SPA de Morges",
 	adresse: "Morges",
-	latitude: 345,
-	longitude: 1235,
+	latitude: 46.30233,
+	longitude: 6.29471,
 });
 
 const spaZurich = new Spa({
 	nom: "SPA de Zurich",
 	adresse: "Zurich",
-	latitude: 345,
-	longitude: 1235,
+	latitude: 47.22334,
+	longitude: 8.32388,
 });
 
 const tagChien = new Tag({
@@ -77,16 +77,14 @@ const tagCurieux = new Tag({
 	nom: "Curieux",
 });
 
-
 const imageMorges = await compressImage("Images/spaMorges_chien.jpg");
-const imageParis = await compressImage("Images/spaParis_chien.jpg");
+const imageParis = await compressImage("Images/spaYverdon_chien.jpg");
 const imageZurich = await compressImage("Images/spaZurich_chien.jpg");
 const imageChatKira = await compressImage("Images/chatKira.jpg");
 const imageChatGouttiere = await compressImage("Images/chat-de-gouttiere.jpg");
 const imageChaton = await compressImage("Images/chaton.jpg");
 const imageLapin = await compressImage("Images/lapin.jpg");
 const imageLapinou = await compressImage("Images/lapinou.jpeg");
-
 
 const chienToffee = new Pet({
 	nom: "Toffee",
@@ -107,7 +105,7 @@ const chienToffee = new Pet({
 		},
 	],
 	tags: [tagChien._id, tagJoueur._id],
-	spa_id: spaParis._id,
+	spa_id: spaYverdon._id,
 	likes_count: 0,
 	dislikes_count: 0,
 });
@@ -130,7 +128,7 @@ const chienCara = new Pet({
 		},
 	],
 	tags: [tagChien._id, tagJoueur._id],
-	spa_id: spaParis._id,
+	spa_id: spaYverdon._id,
 	likes_count: 0,
 	dislikes_count: 0,
 });
@@ -153,7 +151,7 @@ const chienBeth = new Pet({
 		},
 	],
 	tags: [tagChien._id, tagJoueur._id],
-	spa_id: spaParis._id,
+	spa_id: spaYverdon._id,
 	likes_count: 0,
 	dislikes_count: 0,
 });
@@ -315,7 +313,7 @@ const chatKira = new Pet({
 		},
 	],
 	tags: [tagChat._id, tagCalme._id],
-	spa_id: spaParis._id,
+	spa_id: spaYverdon._id,
 	likes_count: 2,
 	dislikes_count: 0,
 });
@@ -380,7 +378,7 @@ const lapinJojo = new Pet({
 		},
 	],
 	tags: [tagLapin._id, tagTurbulant, tagCurieux._id],
-	spa_id: spaParis._id,
+	spa_id: spaYverdon._id,
 	likes_count: 1,
 	dislikes_count: 1,
 });
@@ -417,7 +415,7 @@ const adoption = new Adoption({
 		{
 			content: "Merci pour votre intérêt. Nous allons examiner votre demande.",
 			date: new Date(),
-			user_id: userParis._id,
+			user_id: userYverdon._id,
 		},
 	],
 });
@@ -435,7 +433,7 @@ const conversation2 = new Adoption({
 		{
 			content: "Bonjour, merci pour votre intérêt. Nous allons examiner votre demande.",
 			date: new Date(),
-			user_id: userParis._id,
+			user_id: userYverdon._id,
 		},
 		{
 			content: "D'accord, savez-vous combien de temps ça prendra ?",
@@ -445,7 +443,7 @@ const conversation2 = new Adoption({
 		{
 			content: "Nous vous répondrons dans les plus brefs délais, d'ici 1 à 2 jours.",
 			date: new Date(),
-			user_id: userParis._id,
+			user_id: userYverdon._id,
 		},
 	],
 });
@@ -453,10 +451,10 @@ const conversation2 = new Adoption({
 userclient.likes = [chienArthur._id, chienCaline._id, chienMerlan._id];
 // Supprimer toutes les collections existantes
 await mongoose.connection.dropDatabase();
-userParis.save();
+userYverdon.save();
 userclient.save();
 spaMorges.save();
-spaParis.save();
+spaYverdon.save();
 spaZurich.save();
 tagChien.save();
 tagChat.save();
