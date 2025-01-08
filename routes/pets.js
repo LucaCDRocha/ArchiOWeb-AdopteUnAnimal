@@ -1,6 +1,7 @@
 import express from "express";
 import Pet from "../models/pet.js";
 import User from "../models/user.js";
+import Adoption from "../models/adoption.js";
 import { authenticate } from "../middleware/auth.js";
 import { checkSpaLink } from "../middleware/user.js";
 import Tag from "../models/tag.js";
@@ -177,6 +178,15 @@ router.delete("/:id/dislike", authenticate, function (req, res, next) {
 		.catch((err) => {
 			next(err);
 		});
+});
+
+router.get("/:id/adoptions", async (req, res, next) => {
+    try {
+        const adoptions = await Adoption.find({ pet_id: req.params.id }).populate("user_id").exec();
+        res.status(200).send(adoptions);
+    } catch (err) {
+        next(err);
+    }
 });
 
 export default router;

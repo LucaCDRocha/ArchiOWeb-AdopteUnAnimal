@@ -33,6 +33,12 @@ const userclient = new User({
 	email: "john.doe@example.com",
 	password: hashedPasswordClient,
 });
+const userclient2 = new User({
+	firstName: "Elodie",
+	lastName: "Perring",
+	email: "elodie.perring@example.com",
+	password: hashedPasswordClient,
+});
 const spaYverdon = new Spa({
 	nom: "SPA de Paris",
 	adresse: "Paris",
@@ -174,7 +180,7 @@ const chienArthur = new Pet({
 		},
 	],
 	tags: [tagChien._id, tagJoueur._id],
-	spa_id: spaMorges._id,
+	spa_id: spaYverdon._id,
 	likes_count: 1,
 	dislikes_count: 0,
 });
@@ -419,6 +425,23 @@ const adoption = new Adoption({
 		},
 	],
 });
+const adoption2 = new Adoption({
+	date: new Date(),
+	user_id: userclient2._id,
+	pet_id: chienArthur._id,
+	messages: [
+		{
+			content: "Je suis intéressé par l'adoption de ce chien.",
+			date: new Date(),
+			user_id: userclient2._id,
+		},
+		{
+			content: "Merci pour votre intérêt. Nous allons examiner votre demande.",
+			date: new Date(),
+			user_id: userYverdon._id,
+		},
+	],
+});
 
 const conversation2 = new Adoption({
 	date: new Date(),
@@ -453,6 +476,7 @@ userclient.likes = [chienArthur._id, chienCaline._id, chienMerlan._id];
 await mongoose.connection.dropDatabase();
 userYverdon.save();
 userclient.save();
+userclient2.save();
 spaMorges.save();
 spaYverdon.save();
 spaZurich.save();
@@ -477,6 +501,7 @@ chatMojito.save();
 lapinJojo.save();
 lapinRoger.save();
 adoption.save();
+adoption2.save();
 conversation2.save();
 
 chienToffee
