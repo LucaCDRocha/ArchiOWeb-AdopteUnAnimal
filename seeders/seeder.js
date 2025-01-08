@@ -40,8 +40,8 @@ const userclient2 = new User({
 	password: hashedPasswordClient,
 });
 const spaYverdon = new Spa({
-	nom: "SPA de Paris",
-	adresse: "Paris",
+	nom: "SPA de Yverdon",
+	adresse: "Yverdon",
 	latitude: 46.46514,
 	longitude: 6.38484,
 	user_id: userYverdon._id,

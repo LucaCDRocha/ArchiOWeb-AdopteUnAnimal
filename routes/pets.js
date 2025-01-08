@@ -6,6 +6,7 @@ import { authenticate } from "../middleware/auth.js";
 import { checkSpaLink } from "../middleware/user.js";
 import Tag from "../models/tag.js";
 import Spa from "../models/spa.js"; // Ensure this path is correct
+import { calculateDistance } from "../utils/position.js";
 
 const router = express.Router();
 
@@ -24,7 +25,17 @@ router.get("/", authenticate, function (req, res, next) {
 				.sort("-dislikes_count")
 				.exec()
 				.then((pets) => {
-					res.status(200).send(pets);
+					const { latitude, longitude } = req.query;
+					if (latitude && longitude) {
+						const sortedPets = pets.sort((a, b) => {
+							const distanceA = calculateDistance({ latitude, longitude }, a.spa_id);
+							const distanceB = calculateDistance({ latitude, longitude }, b.spa_id);
+							return distanceA - distanceB;
+						});
+						res.status(200).send(sortedPets);
+					} else {
+						res.status(200).send(pets);
+					}
 				})
 				.catch((err) => {
 					next(err);
