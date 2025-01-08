@@ -20,34 +20,46 @@ const httpServer = http.createServer(app);
 // Create WebSocket server
 const wss = new WebSocketServer({ server: httpServer });
 
-wss.on("connection", (ws) => {
-    console.log("New client connected");
+const clients = new Map();
 
-    ws.on("message", (data) => {
-        const { adoptionId, message } = JSON.parse(data);
-        Adoption.findById(adoptionId)
-            .exec()
-            .then((adoption) => {
-                if (!adoption) {
-                    return;
-                }
-                adoption.messages.push(message);
-                return adoption.save().then((updatedAdoption) => {
-                    wss.clients.forEach((client) => {
-                        if (client.readyState === WebSocket.OPEN) {
-                            client.send(JSON.stringify(message));
-                        }
-                    });
-                });
-            })
-            .catch((err) => {
-                console.error(err);
-            });
-    });
+wss.on("connection", (ws, req) => {
+	console.log("New client connected");
 
-    ws.on("close", () => {
-        console.log("Client disconnected");
-    });
+	ws.on("message", (data) => {
+		const parsedData = JSON.parse(data);
+		if (parsedData.type === "authenticate") {
+			clients.set(ws, { userId: parsedData.userId, adoptionId: parsedData.adoptionId });
+			return;
+		}
+
+		const { adoptionId, message } = parsedData;
+		Adoption.findById(adoptionId)
+			.populate("pet_id")
+			.exec()
+			.then((adoption) => {
+				if (!adoption) {
+					return;
+				}
+				adoption.messages.push(message);
+				return adoption.save().then((updatedAdoption) => {
+					const userIds = [adoption.user_id.toString(), adoption.pet_id.spa_id.toString()];
+					wss.clients.forEach((client) => {
+						const clientInfo = clients.get(client);
+						if (client.readyState === WebSocket.OPEN && userIds.includes(clientInfo.userId) && clientInfo.adoptionId === adoptionId) {
+							client.send(JSON.stringify(message));
+						}
+					});
+				});
+			})
+			.catch((err) => {
+				console.error(err);
+			});
+	});
+
+	ws.on("close", () => {
+		console.log("Client disconnected");
+		clients.delete(ws);
+	});
 });
 
 // Listen on provided port, on all network interfaces
