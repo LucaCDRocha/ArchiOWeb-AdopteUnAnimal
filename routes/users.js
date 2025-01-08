@@ -107,13 +107,15 @@ router.get("/:id/adoptions", authenticate, loadUserByRequestId, async (req, res,
 
 router.get("/:id/likes", authenticate, loadUserByRequestId, async (req, res, next) => {
 	try {
-		const user = await User.findById(req.params.id).populate({
-			path: "likes",
-			populate: [
-				{ path: "tags", model: "Tag" },
-				{ path: "spa_id", model: "Spa" },
-			],
-		}).exec();
+		const user = await User.findById(req.params.id)
+			.populate({
+				path: "likes",
+				populate: [
+					{ path: "tags", model: "Tag" },
+					{ path: "spa_id", model: "Spa" },
+				],
+			})
+			.exec();
 		res.status(200).send(user.likes);
 	} catch (err) {
 		next(err);
@@ -148,8 +150,7 @@ router.post("/login", async (req, res, next) => {
 });
 
 router.get("/:id/spa", authenticate, checkSpaLink, function (req, res, next) {
-
-res.send(req.spa);
+	res.send(req.spa);
 });
 
 export default router;
