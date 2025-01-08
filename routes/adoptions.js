@@ -41,7 +41,15 @@ router.post("/", function (req, res, next) {
 router.get("/:id", authenticate, function (req, res, next) {
 	Adoption.findById(req.params.id)
 		.populate("user_id")
-		.populate("pet_id")
+		.populate({
+			path: "pet_id",
+			populate: [
+				{
+					path: "spa_id",
+					model: "Spa"
+				}
+			]
+		})
 		.exec()
 		.then((adoption) => {
 			if (!adoption) {
