@@ -14,4 +14,4 @@ function calculateDistance(src, dest) {
 	return angle * 6371000;
 }
 
-export { calculateDistance, calculateDistance };
+export { calculateDistance };
