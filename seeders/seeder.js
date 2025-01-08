@@ -226,7 +226,7 @@ const chienCookie = new Pet({
 		},
 	],
 	tags: [tagChien._id, tagJoueur._id],
-	spa_id: spaMorges._id,
+	spa_id: spaYverdon._id,
 	likes_count: 0,
 	dislikes_count: 0,
 });

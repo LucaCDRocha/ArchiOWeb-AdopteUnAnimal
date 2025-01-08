@@ -34,7 +34,15 @@ wss.on("connection", (ws, req) => {
 
 		const { adoptionId, message } = parsedData;
 		Adoption.findById(adoptionId)
-			.populate("pet_id")
+		.populate({
+			path: "pet_id",
+			populate: [
+				{
+					path: "spa_id",
+					model: "Spa"
+				}
+			]
+		})
 			.exec()
 			.then((adoption) => {
 				if (!adoption) {
@@ -42,10 +50,16 @@ wss.on("connection", (ws, req) => {
 				}
 				adoption.messages.push(message);
 				return adoption.save().then((updatedAdoption) => {
-					const userIds = [adoption.user_id.toString(), adoption.pet_id.spa_id.toString()];
+					const userIds = [adoption.user_id.toString(), adoption.pet_id.spa_id.user_id.toString()];
 					wss.clients.forEach((client) => {
 						const clientInfo = clients.get(client);
-						if (client.readyState === WebSocket.OPEN && userIds.includes(clientInfo.userId) && clientInfo.adoptionId === adoptionId) {
+						console.log(clientInfo.userId);
+						console.log(userIds);
+						if (
+							client.readyState === WebSocket.OPEN &&
+							userIds.includes(clientInfo.userId.toString()) &&
+							clientInfo.adoptionId === adoptionId
+						) {
 							client.send(JSON.stringify(message));
 						}
 					});
