@@ -41,6 +41,8 @@ router.post("/", function (req, res, next) {
 router.get("/:id/pets", loadSpaByRequestId, function (req, res, next) {
 	Pet.find({ spa_id: req.spa._id })
 		.sort("name")
+		.populate("tags")
+		.populate("spa_id")
 		.exec()
 		.then((pets) => {
 			res.status(200).send(pets);
