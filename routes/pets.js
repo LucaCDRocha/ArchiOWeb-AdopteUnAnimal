@@ -192,12 +192,18 @@ router.delete("/:id/dislike", authenticate, function (req, res, next) {
 });
 
 router.get("/:id/adoptions", async (req, res, next) => {
-    try {
-		const adoptions = await Adoption.find({ pet_id: req.params.id }).populate("user_id").populate("pet_id").exec();
-        res.status(200).send(adoptions);
-    } catch (err) {
-        next(err);
-    }
+	try {
+		const adoptions = await Adoption.find({ pet_id: req.params.id })
+			.populate("user_id")
+			.populate({
+				path: "pet_id",
+				populate: { path: "spa_id" },
+			})
+			.exec();
+		res.status(200).send(adoptions);
+	} catch (err) {
+		next(err);
+	}
 });
 
 export default router;
