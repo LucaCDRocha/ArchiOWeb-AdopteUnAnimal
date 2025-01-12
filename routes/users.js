@@ -98,8 +98,45 @@ router.delete("/:id", authenticate, loadUserByRequestId, async (req, res, next) 
 
 router.get("/:id/adoptions", authenticate, loadUserByRequestId, async (req, res, next) => {
 	try {
-		const user = await User.findById(req.params.id).populate("adoptions").exec();
-		res.status(200).send(user.adoptions);
+		let adoptions = await Adoption.find({ user_id: req.currentUserId })
+			.populate({
+				path: "pet_id",
+				populate: [
+					{
+						path: "spa_id",
+						model: "Spa",
+					},
+				],
+			})
+			.exec();
+
+		const spa = await Spa.findOne({ user_id: req.currentUserId }).exec();
+		if (spa) {
+			const spaAdoptions = await Adoption.find()
+				.populate({
+					path: "pet_id",
+					match: { spa_id: spa._id },
+					populate: [
+						{
+							path: "spa_id",
+							model: "Spa",
+						},
+					],
+				})
+				.exec();
+			adoptions = adoptions.concat(spaAdoptions);
+		}
+
+		if (adoptions.length === 0) {
+			return res.status(404).send("No adoptions found");
+		} else {
+			adoptions = adoptions.sort((a, b) => {
+				const dateA = a.messages.at(-1).date;
+				const dateB = b.messages.at(-1).date;
+				return dateA < dateB ? 1 : dateA > dateB ? -1 : 0;
+			});
+			res.status(200).send(adoptions);
+		}
 	} catch (err) {
 		next(err);
 	}

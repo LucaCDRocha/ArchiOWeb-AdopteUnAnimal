@@ -7,26 +7,26 @@ import { authenticate } from "../middleware/auth.js";
 const router = express.Router();
 
 router.get("/", authenticate, function (req, res, next) {
-  Adoption.find({ user_id: req.currentUserId})
-    .populate({
+	Adoption.find()
+		.populate({
 			path: "pet_id",
 			populate: [
 				{
 					path: "spa_id",
-					model: "Spa"
-				}
-			]
+					model: "Spa",
+				},
+			],
 		})
-    .exec()
-    .then((adoptions) => {
-      res.status(200).send(adoptions);
-    })
-    .catch((err) => {
-      next(err);
-    });
+		.exec()
+		.then((adoptions) => {
+			res.status(200).send(adoptions);
+		})
+		.catch((err) => {
+			next(err);
+		});
 });
 
-router.post("/", function (req, res, next) {
+router.post("/", authenticate, function (req, res, next) {
 	const newAdoption = new Adoption(req.body);
 	newAdoption
 		.save()
@@ -46,9 +46,9 @@ router.get("/:id", authenticate, function (req, res, next) {
 			populate: [
 				{
 					path: "spa_id",
-					model: "Spa"
-				}
-			]
+					model: "Spa",
+				},
+			],
 		})
 		.exec()
 		.then((adoption) => {
