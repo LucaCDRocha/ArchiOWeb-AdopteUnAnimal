@@ -3,6 +3,7 @@ import Adoption from "../models/adoption.js";
 import User from "../models/user.js";
 import Pet from "../models/pet.js";
 import { authenticate } from "../middleware/auth.js";
+import { addMessageToAdoption } from "../utils/adoptionUtils.js"; // Import the utility function
 
 const router = express.Router();
 
@@ -92,16 +93,9 @@ router.get("/:id/messages", authenticate, function (req, res, next) {
 });
 
 router.post("/:id/messages", authenticate, function (req, res, next) {
-	Adoption.findById(req.params.id)
-		.exec()
-		.then((adoption) => {
-			if (!adoption) {
-				return res.status(404).send("Adoption not found");
-			}
-			adoption.messages.push(req.body);
-			return adoption.save().then((updatedAdoption) => {
-				res.status(201).send(updatedAdoption.messages);
-			});
+	addMessageToAdoption(req.params.id, req.body)
+		.then((updatedMessages) => {
+			res.status(201).send(updatedMessages);
 		})
 		.catch((err) => {
 			next(err);

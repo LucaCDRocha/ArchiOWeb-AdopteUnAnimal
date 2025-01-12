@@ -2,11 +2,10 @@
 
 import createDebugger from "debug";
 import http from "node:http";
-import { WebSocketServer } from "ws";
 
 import app from "../app.js";
 import * as config from "../config.js";
-import Adoption from "../models/adoption.js";
+import { setupWebSocketServer } from "../websocket.js"; // Import the WebSocket setup function
 
 const debug = createDebugger("ArchiOWeb-AdopteUnAnimal:server");
 
@@ -18,63 +17,7 @@ app.set("port", port);
 const httpServer = http.createServer(app);
 
 // Create WebSocket server
-const wss = new WebSocketServer({ server: httpServer });
-
-const clients = new Map();
-
-wss.on("connection", (ws, req) => {
-	console.log("New client connected");
-
-	ws.on("message", (data) => {
-		const parsedData = JSON.parse(data);
-		if (parsedData.type === "authenticate") {
-			clients.set(ws, { userId: parsedData.userId, adoptionId: parsedData.adoptionId });
-			return;
-		}
-
-		const { adoptionId, message } = parsedData;
-		Adoption.findById(adoptionId)
-		.populate({
-			path: "pet_id",
-			populate: [
-				{
-					path: "spa_id",
-					model: "Spa"
-				}
-			]
-		})
-			.exec()
-			.then((adoption) => {
-				if (!adoption) {
-					return;
-				}
-				adoption.messages.push(message);
-				return adoption.save().then((updatedAdoption) => {
-					const userIds = [adoption.user_id.toString(), adoption.pet_id.spa_id.user_id.toString()];
-					wss.clients.forEach((client) => {
-						const clientInfo = clients.get(client);
-						console.log(clientInfo.userId);
-						console.log(userIds);
-						if (
-							client.readyState === WebSocket.OPEN &&
-							userIds.includes(clientInfo.userId.toString()) &&
-							clientInfo.adoptionId === adoptionId
-						) {
-							client.send(JSON.stringify(message));
-						}
-					});
-				});
-			})
-			.catch((err) => {
-				console.error(err);
-			});
-	});
-
-	ws.on("close", () => {
-		console.log("Client disconnected");
-		clients.delete(ws);
-	});
-});
+setupWebSocketServer(httpServer); // Setup WebSocket server
 
 // Listen on provided port, on all network interfaces
 httpServer.listen(port);
