@@ -1,4 +1,3 @@
-
 import Adoption from "../models/adoption.js";
 
 export async function addMessageToAdoption(adoptionId, message) {
@@ -8,9 +7,9 @@ export async function addMessageToAdoption(adoptionId, message) {
 			populate: [
 				{
 					path: "spa_id",
-					model: "Spa"
-				}
-			]
+					model: "Spa",
+				},
+			],
 		})
 		.exec()
 		.then((adoption) => {

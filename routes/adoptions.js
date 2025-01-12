@@ -28,11 +28,25 @@ router.get("/", authenticate, function (req, res, next) {
 });
 
 router.post("/", authenticate, function (req, res, next) {
-	const newAdoption = new Adoption(req.body);
-	newAdoption
-		.save()
+	Adoption.findOne({ user_id: req.currentUserId, pet_id: req.body.pet_id })
+		.exec()
+		.then((existingAdoption) => {
+			if (existingAdoption) {
+				res.status(409).send(existingAdoption);
+				return
+			}
+			const newAdoption = new Adoption({
+				user_id: req.currentUserId,
+				pet_id: req.body.pet_id,
+				messages: [],
+				date: new Date(),
+			});
+			return newAdoption.save();
+		})
 		.then((adoption) => {
-			res.status(201).send(adoption);
+			if (adoption) {
+				res.status(201).send(adoption);
+			}
 		})
 		.catch((err) => {
 			next(err);

@@ -112,10 +112,11 @@ router.get("/:id/adoptions", authenticate, loadUserByRequestId, async (req, res,
 
 		const spa = await Spa.findOne({ user_id: req.currentUserId }).exec();
 		if (spa) {
-			const spaAdoptions = await Adoption.find()
+			const spaAdoptions = await Adoption.find({
+				pet_id: { $in: await Pet.find({ spa_id: spa._id }).select("_id").exec() },
+			})
 				.populate({
 					path: "pet_id",
-					match: { spa_id: spa._id },
 					populate: [
 						{
 							path: "spa_id",
