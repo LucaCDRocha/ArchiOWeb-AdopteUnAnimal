@@ -5,7 +5,7 @@ import Adoption from "../models/adoption.js";
 import { authenticate } from "../middleware/auth.js";
 import { checkSpaLink } from "../middleware/user.js";
 import Tag from "../models/tag.js";
-import Spa from "../models/spa.js"; // Ensure this path is correct
+import Spa from "../models/spa.js";
 import { calculateDistance } from "../utils/position.js";
 
 const router = express.Router();
@@ -100,7 +100,7 @@ router.delete("/:id", authenticate, checkSpaLink, function (req, res, next) {
 			if (!pet) {
 				return res.status(404).send("Pet not found");
 			}
-			res.status(200).send("Pet deleted successfully");
+			res.sendStatus(204); // No Content
 		})
 		.catch((err) => {
 			next(err);

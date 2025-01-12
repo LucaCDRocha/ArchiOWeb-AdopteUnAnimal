@@ -69,7 +69,7 @@ router.delete("/:id", authenticate, function (req, res, next) {
 			if (!adoption) {
 				return res.status(404).send("Adoption not found");
 			}
-			res.status(200).send("Adoption deleted successfully");
+			res.sendStatus(204); // No Content
 		})
 		.catch((err) => {
 			next(err);
