@@ -154,7 +154,26 @@ router.get("/:id/likes", authenticate, loadUserByRequestId, async (req, res, nex
 				],
 			})
 			.exec();
-		res.status(200).send(user.likes);
+
+		const adoptions = await Adoption.find({ pet_id: { $in: user.likes } }).exec();
+		const pets = user.likes.map((pet) => {
+			const adoption = adoptions.find((adoption) => adoption.pet_id.equals(pet._id));
+			const newPet = {
+				_id: pet._id,
+				nom: pet.nom,
+				age: pet.age,
+				description: pet.description,
+				images: pet.images,
+				tags: pet.tags,
+				spa_id: pet.spa_id,
+				likes_count: pet.likes_count,
+				dislikes_count: pet.dislikes_count,
+				adoptionId: adoption ? adoption._id : null,
+			};
+			return newPet;
+		});
+
+		res.status(200).send(pets);
 	} catch (err) {
 		next(err);
 	}
