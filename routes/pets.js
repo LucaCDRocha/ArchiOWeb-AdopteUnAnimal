@@ -100,6 +100,10 @@ router.delete("/:id", authenticate, checkSpaLink, function (req, res, next) {
 			if (!pet) {
 				return res.status(404).send("Pet not found");
 			}
+			// Cascade delete adoptions related to the pet
+			return Adoption.deleteMany({ pet_id: req.params.id }).exec();
+		})
+		.then(() => {
 			res.sendStatus(204); // No Content
 		})
 		.catch((err) => {
@@ -138,7 +142,14 @@ router.delete("/:id/like", authenticate, function (req, res, next) {
 			User.findByIdAndUpdate(req.currentUserId, { $pull: { likes: pet._id } }, { new: true })
 				.exec()
 				.then((user) => {
-					res.status(200).send(pet);
+					Adoption.findOneAndDelete({ pet_id: req.params.id, user_id: req.currentUserId })
+						.exec()
+						.then(() => {
+							res.sendStatus(204);
+						})
+						.catch((err) => {
+							next(err);
+						});
 				})
 				.catch((err) => {
 					next(err);
