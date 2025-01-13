@@ -124,6 +124,7 @@ router.get("/:id/adoptions", authenticate, loadUserByRequestId, async (req, res,
 						},
 					],
 				})
+				.populate("user_id")
 				.exec();
 			adoptions = adoptions.concat(spaAdoptions);
 		}
