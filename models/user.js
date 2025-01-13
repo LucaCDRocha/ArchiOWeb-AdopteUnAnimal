@@ -8,7 +8,6 @@ const userSchema = new Schema({
 	password: { type: String, required: true },
 	likes: [{ type: mongoose.Types.ObjectId, ref: "Pet" }],
 	dislikes: [{ type: mongoose.Types.ObjectId, ref: "Pet" }],
-	adoptions: [{ type: mongoose.Types.ObjectId, ref: "Adoption" }],
 });
 
 userSchema.set("toJSON", {
