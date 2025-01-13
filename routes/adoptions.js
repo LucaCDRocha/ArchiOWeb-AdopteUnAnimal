@@ -33,7 +33,7 @@ router.post("/", authenticate, function (req, res, next) {
 		.then((existingAdoption) => {
 			if (existingAdoption) {
 				res.status(409).send(existingAdoption);
-				return
+				return;
 			}
 			const newAdoption = new Adoption({
 				user_id: req.currentUserId,
@@ -69,6 +69,9 @@ router.get("/:id", authenticate, function (req, res, next) {
 		.then((adoption) => {
 			if (!adoption) {
 				return res.status(404).send("Adoption not found");
+			}
+			if (adoption.user_id._id.toString() !== req.currentUserId) {
+				return res.status(403).send("Unauthorized");
 			}
 			res.status(200).send(adoption);
 		})
@@ -135,6 +138,39 @@ router.delete("/:id/messages/:msg_id", authenticate, function (req, res, next) {
 		.catch((err) => {
 			next(err);
 		});
+});
+
+router.put("/:id/status", authenticate, async function (req, res, next) {
+	try {
+		const adoption = await Adoption.findById(req.params.id).exec();
+		console.log(adoption);
+		if (!adoption) {
+			return res.status(404).send("Adoption not found");
+		}
+
+		adoption.status = req.body.status;
+		await adoption.save();
+
+		switch (req.body.status) {
+			case "accepted":
+				await Pet.findByIdAndUpdate(adoption.pet_id, { isAdopted: true }, { new: true }).exec();
+				await Adoption.updateMany({ pet_id: adoption.pet_id, status: "pending" }, { status: "rejected" }).exec();
+				break;
+			case "pending":
+				await Pet.findByIdAndUpdate(adoption.pet_id, { isAdopted: false }, { new: true }).exec();
+				await Adoption.updateMany(
+					{ pet_id: adoption.pet_id, status: { $ne: "accepted" } },
+					{ status: "pending" }
+				).exec();
+				break;
+			default:
+				break;
+		}
+
+		res.status(200).send(adoption);
+	} catch (err) {
+		next(err);
+	}
 });
 
 export default router;

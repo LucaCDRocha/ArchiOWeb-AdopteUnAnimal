@@ -19,7 +19,7 @@ router.get("/", authenticate, function (req, res, next) {
 			}
 			const excludedPets = [...user.likes, ...user.dislikes];
 			const tagFilter = req.query.tags ? { tags: { $all: req.query.tags.split(",") } } : {};
-			Pet.find({ _id: { $nin: excludedPets }, ...tagFilter })
+			Pet.find({ _id: { $nin: excludedPets }, ...tagFilter, isAdopted: false })
 				.populate("spa_id")
 				.populate("tags")
 				.sort("-dislikes_count")
