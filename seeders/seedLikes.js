@@ -10,6 +10,12 @@ export async function seedLikes() {
 	userclient.likes.push(chienArthur._id, chienCookie._id);
 	userclient2.likes.push(chienArthur._id);
 
+	chienArthur.likes_count = 2;
+	chienCookie.likes_count = 1;
+
 	await userclient.save();
 	await userclient2.save();
+
+	await chienArthur.save();
+	await chienCookie.save();
 }

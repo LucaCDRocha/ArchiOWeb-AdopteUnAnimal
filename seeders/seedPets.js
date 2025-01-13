@@ -35,8 +35,6 @@ export async function seedPets() {
 		],
 		tags: [tagChien._id, tagJoueur._id],
 		spa_id: spaYverdon._id,
-		likes_count: 0,
-		dislikes_count: 0,
 	});
 	const chienCara = new Pet({
 		nom: "Cara",
@@ -49,8 +47,6 @@ export async function seedPets() {
 		],
 		tags: [tagChien._id, tagJoueur._id],
 		spa_id: spaYverdon._id,
-		likes_count: 0,
-		dislikes_count: 0,
 	});
 	const chienBeth = new Pet({
 		nom: "Bethany",
@@ -63,8 +59,6 @@ export async function seedPets() {
 		],
 		tags: [tagChien._id, tagJoueur._id],
 		spa_id: spaYverdon._id,
-		likes_count: 0,
-		dislikes_count: 0,
 	});
 	const chienArthur = new Pet({
 		nom: "Arthur",
@@ -77,8 +71,6 @@ export async function seedPets() {
 		],
 		tags: [tagChien._id, tagJoueur._id],
 		spa_id: spaYverdon._id,
-		likes_count: 1,
-		dislikes_count: 0,
 	});
 	const chienMerlan = new Pet({
 		nom: "Merlan",
@@ -91,8 +83,6 @@ export async function seedPets() {
 		],
 		tags: [tagChien._id, tagJoueur._id],
 		spa_id: spaMorges._id,
-		likes_count: 1,
-		dislikes_count: 0,
 	});
 	const chienCookie = new Pet({
 		nom: "Cookie",
@@ -105,8 +95,6 @@ export async function seedPets() {
 		],
 		tags: [tagChien._id, tagJoueur._id],
 		spa_id: spaYverdon._id,
-		likes_count: 0,
-		dislikes_count: 0,
 	});
 	const chienBat = new Pet({
 		nom: "Bat",
@@ -119,8 +107,6 @@ export async function seedPets() {
 		],
 		tags: [tagChien._id, tagJoueur._id],
 		spa_id: spaZurich._id,
-		likes_count: 0,
-		dislikes_count: 0,
 	});
 	const chienJoie = new Pet({
 		nom: "Joie",
@@ -133,8 +119,6 @@ export async function seedPets() {
 		],
 		tags: [tagChien._id, tagJoueur._id],
 		spa_id: spaZurich._id,
-		likes_count: 0,
-		dislikes_count: 0,
 	});
 	const chienCaline = new Pet({
 		nom: "Caline",
@@ -148,8 +132,6 @@ export async function seedPets() {
 		],
 		tags: [tagChien._id, tagJoueur._id],
 		spa_id: spaZurich._id,
-		likes_count: 1,
-		dislikes_count: 0,
 	});
 	const chatKira = new Pet({
 		nom: "Kira",
@@ -162,8 +144,6 @@ export async function seedPets() {
 		],
 		tags: [tagChat._id, tagCalme._id],
 		spa_id: spaYverdon._id,
-		likes_count: 2,
-		dislikes_count: 0,
 	});
 	const chatPito = new Pet({
 		nom: "Pito",
@@ -176,8 +156,6 @@ export async function seedPets() {
 		],
 		tags: [tagChat._id, tagJoueur._id, tagCurieux._id, tagTurbulant._id],
 		spa_id: spaMorges._id,
-		likes_count: 1,
-		dislikes_count: 3,
 	});
 	const chatMojito = new Pet({
 		nom: "Mojito",
@@ -190,8 +168,6 @@ export async function seedPets() {
 		],
 		tags: [tagChat._id, tagCalme],
 		spa_id: spaMorges._id,
-		likes_count: 3,
-		dislikes_count: 0,
 	});
 	const lapinJojo = new Pet({
 		nom: "Jojo",
@@ -203,8 +179,6 @@ export async function seedPets() {
 		],
 		tags: [tagLapin._id, tagTurbulant, tagCurieux._id],
 		spa_id: spaYverdon._id,
-		likes_count: 1,
-		dislikes_count: 1,
 	});
 	const lapinRoger = new Pet({
 		nom: "Roger",
@@ -216,8 +190,6 @@ export async function seedPets() {
 		],
 		tags: [tagLapin._id, tagJoueur, tagCurieux._id],
 		spa_id: spaZurich._id,
-		likes_count: 2,
-		dislikes_count: 1,
 	});
 
 	await chienToffee.save();
