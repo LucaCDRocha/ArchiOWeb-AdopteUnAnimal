@@ -155,7 +155,7 @@ router.get("/:id/likes", authenticate, loadUserByRequestId, async (req, res, nex
 			})
 			.exec();
 
-		const adoptions = await Adoption.find({ pet_id: { $in: user.likes } }).exec();
+		const adoptions = await Adoption.find({ pet_id: { $in: user.likes }, user_id: user._id }).exec();
 		const pets = user.likes.map((pet) => {
 			const adoption = adoptions.find((adoption) => adoption.pet_id.equals(pet._id));
 			const newPet = {
