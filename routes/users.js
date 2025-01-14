@@ -89,6 +89,26 @@ router.delete("/:id", authenticate, loadUserByRequestId, async (req, res, next) 
 	}
 
 	try {
+		// Delete user's adoptions
+		await Adoption.deleteMany({ user_id: req.params.id });
+
+		// Delete user's likes
+		const user = await User.findById(req.params.id).exec();
+		if (user.likes && user.likes.length > 0) {
+			await Pet.updateMany({ _id: { $in: user.likes } }, { $inc: { likes_count: -1 } });
+		}
+
+		// Check if user is part of a spa and delete pets if so
+		const spa = await Spa.findOne({ user_id: req.params.id }).exec();
+		if (spa) {
+			const pets = await Pet.find({ spa_id: spa._id }).exec();
+			const petIds = pets.map((pet) => pet._id);
+			await Pet.deleteMany({ _id: { $in: petIds } });
+			await Adoption.deleteMany({ pet_id: { $in: petIds } });
+			await Spa.deleteOne({ _id: spa._id });
+		}
+
+		// Delete user
 		await User.deleteOne({ _id: req.params.id });
 		res.sendStatus(204); // No Content
 	} catch (err) {
@@ -124,6 +144,7 @@ router.get("/:id/adoptions", authenticate, loadUserByRequestId, async (req, res,
 						},
 					],
 				})
+				.populate("user_id")
 				.exec();
 			adoptions = adoptions.concat(spaAdoptions);
 		}
@@ -132,8 +153,8 @@ router.get("/:id/adoptions", authenticate, loadUserByRequestId, async (req, res,
 			return res.status(404).send("No adoptions found");
 		} else {
 			adoptions = adoptions.sort((a, b) => {
-				const dateA = a.messages.at(-1).date;
-				const dateB = b.messages.at(-1).date;
+				const dateA = a.messages.length > 0 ? a.messages.at(-1).date : new Date();
+				const dateB = b.messages.length > 0 ? b.messages.at(-1).date : new Date();
 				return dateA < dateB ? 1 : dateA > dateB ? -1 : 0;
 			});
 			res.status(200).send(adoptions);
@@ -144,44 +165,84 @@ router.get("/:id/adoptions", authenticate, loadUserByRequestId, async (req, res,
 });
 
 router.get("/:id/likes", authenticate, loadUserByRequestId, async (req, res, next) => {
+    try {
+        const user = req.user;
+
+        // Parse the "page" param (default to 1 if invalid)
+        let page = parseInt(req.query.page, 10);
+        if (isNaN(page) || page < 1) {
+            page = 1;
+        }
+
+        // Set the pageSize to 3
+        const pageSize = 3;
+
+        // Get the total number of likes
+        const totalLikes = user.likes.length;
+
+        // Calculate the number of pages
+        const totalPages = Math.ceil(totalLikes / pageSize);
+
+        // Get the likes for the current page
+        const likes = user.likes.slice((page - 1) * pageSize, page * pageSize);
+
+        // Fetch the pets and adoptions for the current page of likes
+        const pets = await Pet.find({ _id: { $in: likes } })
+            .populate([
+                { path: "tags", model: "Tag" },
+                { path: "spa_id", model: "Spa" },
+            ])
+            .exec();
+
+        const adoptions = await Adoption.find({ pet_id: { $in: likes }, user_id: user._id }).exec();
+
+        const paginatedPets = pets.map((pet) => {
+            const adoption = adoptions.find((adoption) => adoption.pet_id.equals(pet._id));
+            const newPet = {
+                _id: pet._id,
+                nom: pet.nom,
+                age: pet.age,
+                description: pet.description,
+                images: pet.images,
+                tags: pet.tags,
+                spa_id: pet.spa_id,
+                likes_count: pet.likes_count,
+                dislikes_count: pet.dislikes_count,
+                adoptionId: adoption ? adoption._id : null,
+            };
+            return newPet;
+        });
+
+        // Set pagination headers
+        res.set('Pagination-Page', page);
+        res.set('Pagination-PageSize', pageSize);
+        res.set('Pagination-Total', totalLikes);
+
+        // Send response with paginated results
+        res.status(200).json({
+            page,
+            pageSize,
+            totalLikes,
+            totalPages,
+            pets: paginatedPets,
+        });
+    } catch (err) {
+        next(err);
+    }
+});
+
+router.get("/:id/dislikes", authenticate, loadUserByRequestId, async (req, res, next) => {
 	try {
 		const user = await User.findById(req.params.id)
 			.populate({
-				path: "likes",
+				path: "dislikes",
+				match: { isAdopted: false },
 				populate: [
 					{ path: "tags", model: "Tag" },
 					{ path: "spa_id", model: "Spa" },
 				],
 			})
 			.exec();
-
-		const adoptions = await Adoption.find({ pet_id: { $in: user.likes }, user_id: user._id }).exec();
-		const pets = user.likes.map((pet) => {
-			const adoption = adoptions.find((adoption) => adoption.pet_id.equals(pet._id));
-			const newPet = {
-				_id: pet._id,
-				nom: pet.nom,
-				age: pet.age,
-				description: pet.description,
-				images: pet.images,
-				tags: pet.tags,
-				spa_id: pet.spa_id,
-				likes_count: pet.likes_count,
-				dislikes_count: pet.dislikes_count,
-				adoptionId: adoption ? adoption._id : null,
-			};
-			return newPet;
-		});
-
-		res.status(200).send(pets);
-	} catch (err) {
-		next(err);
-	}
-});
-
-router.get("/:id/dislikes", authenticate, loadUserByRequestId, async (req, res, next) => {
-	try {
-		const user = await User.findById(req.params.id).populate("dislikes").exec();
 		res.status(200).send(user.dislikes);
 	} catch (err) {
 		next(err);

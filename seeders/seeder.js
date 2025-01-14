@@ -11,7 +11,12 @@ import { seedLikes } from "./seedLikes.js";
 mongoose.connect(config.databaseUrl);
 
 // Supprimer toutes les collections existantes
-await mongoose.connection.dropDatabase();
+const collections = Object.keys(mongoose.connection.collections);
+
+for (const collectionName of collections) {
+    const collection = mongoose.connection.collections[collectionName];
+    await collection.deleteMany({});
+}
 
 // Seed data
 await seedUsers();

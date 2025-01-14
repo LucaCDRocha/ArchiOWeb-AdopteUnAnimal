@@ -6,7 +6,7 @@ import Pet from "../models/pet.js";
 
 const router = express.Router();
 
-router.get("/", function (req, res, next) {
+router.get("/", authenticate, function (req, res, next) {
 	Spa.find()
 		.sort("nom")
 		.exec()
@@ -18,7 +18,7 @@ router.get("/", function (req, res, next) {
 		});
 });
 
-router.get("/:id", loadSpaByRequestId, function (req, res, next) {
+router.get("/:id", authenticate, loadSpaByRequestId, function (req, res, next) {
 	try {
 		res.status(200).send(req.spa);
 	} catch (err) {
@@ -26,7 +26,7 @@ router.get("/:id", loadSpaByRequestId, function (req, res, next) {
 	}
 });
 
-router.post("/", function (req, res, next) {
+router.post("/", authenticate, function (req, res, next) {
 	const newSpa = new Spa(req.body);
 	newSpa
 		.save()
@@ -38,7 +38,7 @@ router.post("/", function (req, res, next) {
 		});
 });
 
-router.get("/:id/pets", loadSpaByRequestId, function (req, res, next) {
+router.get("/:id/pets", authenticate, loadSpaByRequestId, function (req, res, next) {
 	Pet.find({ spa_id: req.spa._id })
 		.sort("name")
 		.populate("tags")
@@ -52,7 +52,7 @@ router.get("/:id/pets", loadSpaByRequestId, function (req, res, next) {
 		});
 });
 
-router.put("/:id", loadSpaByRequestId, async function (req, res, next) {
+router.put("/:id", authenticate, loadSpaByRequestId, async function (req, res, next) {
 	const spa = req.spa;
 	spa.nom = req.body.nom;
 	spa.addresse = req.body.addresse;
@@ -68,7 +68,7 @@ router.put("/:id", loadSpaByRequestId, async function (req, res, next) {
 	}
 });
 
-router.delete("/:id", loadSpaByRequestId, async function (req, res, next) {
+router.delete("/:id", authenticate, loadSpaByRequestId, async function (req, res, next) {
 	try {
 		await req.spa.deleteOne();
 		res.sendStatus(204); // No Content

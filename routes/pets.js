@@ -19,7 +19,7 @@ router.get("/", authenticate, function (req, res, next) {
 			}
 			const excludedPets = [...user.likes, ...user.dislikes];
 			const tagFilter = req.query.tags ? { tags: { $all: req.query.tags.split(",") } } : {};
-			Pet.find({ _id: { $nin: excludedPets }, ...tagFilter })
+			Pet.find({ _id: { $nin: excludedPets }, ...tagFilter, isAdopted: false })
 				.populate("spa_id")
 				.populate("tags")
 				.sort("-dislikes_count")
@@ -100,6 +100,11 @@ router.delete("/:id", authenticate, checkSpaLink, function (req, res, next) {
 			if (!pet) {
 				return res.status(404).send("Pet not found");
 			}
+			// Cascade delete adoptions related to the pet
+			User.updateMany({ likes: req.params.id }, { $pull: { likes: req.params.id } }).exec()
+			return Adoption.deleteMany({ pet_id: req.params.id }).exec();
+		})
+		.then(() => {
 			res.sendStatus(204); // No Content
 		})
 		.catch((err) => {
@@ -138,7 +143,14 @@ router.delete("/:id/like", authenticate, function (req, res, next) {
 			User.findByIdAndUpdate(req.currentUserId, { $pull: { likes: pet._id } }, { new: true })
 				.exec()
 				.then((user) => {
-					res.status(200).send(pet);
+					Adoption.findOneAndDelete({ pet_id: req.params.id, user_id: req.currentUserId })
+						.exec()
+						.then(() => {
+							res.sendStatus(204);
+						})
+						.catch((err) => {
+							next(err);
+						});
 				})
 				.catch((err) => {
 					next(err);
@@ -191,7 +203,7 @@ router.delete("/:id/dislike", authenticate, function (req, res, next) {
 		});
 });
 
-router.get("/:id/adoptions", async (req, res, next) => {
+router.get("/:id/adoptions", authenticate, async (req, res, next) => {
 	try {
 		const adoptions = await Adoption.find({ pet_id: req.params.id })
 			.populate("user_id")
