@@ -95,17 +95,14 @@ router.delete("/:id", authenticate, loadUserByRequestId, async (req, res, next) 
 		// Delete user's likes
 		const user = await User.findById(req.params.id).exec();
 		if (user.likes && user.likes.length > 0) {
-			await Pet.updateMany(
-				{ _id: { $in: user.likes } },
-				{ $inc: { likes_count: -1 } }
-			);
+			await Pet.updateMany({ _id: { $in: user.likes } }, { $inc: { likes_count: -1 } });
 		}
 
 		// Check if user is part of a spa and delete pets if so
 		const spa = await Spa.findOne({ user_id: req.params.id }).exec();
 		if (spa) {
 			const pets = await Pet.find({ spa_id: spa._id }).exec();
-			const petIds = pets.map(pet => pet._id);
+			const petIds = pets.map((pet) => pet._id);
 			await Pet.deleteMany({ _id: { $in: petIds } });
 			await Adoption.deleteMany({ pet_id: { $in: petIds } });
 			await Spa.deleteOne({ _id: spa._id });
@@ -172,6 +169,7 @@ router.get("/:id/likes", authenticate, loadUserByRequestId, async (req, res, nex
 		const user = await User.findById(req.params.id)
 			.populate({
 				path: "likes",
+				match: { isAdopted: false },
 				populate: [
 					{ path: "tags", model: "Tag" },
 					{ path: "spa_id", model: "Spa" },
@@ -205,7 +203,16 @@ router.get("/:id/likes", authenticate, loadUserByRequestId, async (req, res, nex
 
 router.get("/:id/dislikes", authenticate, loadUserByRequestId, async (req, res, next) => {
 	try {
-		const user = await User.findById(req.params.id).populate("dislikes").exec();
+		const user = await User.findById(req.params.id)
+			.populate({
+				path: "dislikes",
+				match: { isAdopted: false },
+				populate: [
+					{ path: "tags", model: "Tag" },
+					{ path: "spa_id", model: "Spa" },
+				],
+			})
+			.exec();
 		res.status(200).send(user.dislikes);
 	} catch (err) {
 		next(err);
