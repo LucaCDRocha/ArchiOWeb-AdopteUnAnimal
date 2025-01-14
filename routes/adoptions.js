@@ -146,7 +146,6 @@ router.delete("/:id/messages/:msg_id", authenticate, function (req, res, next) {
 router.put("/:id/status", authenticate, async function (req, res, next) {
 	try {
 		const adoption = await Adoption.findById(req.params.id).exec();
-		console.log(adoption);
 		if (!adoption) {
 			return res.status(404).send("Adoption not found");
 		}
