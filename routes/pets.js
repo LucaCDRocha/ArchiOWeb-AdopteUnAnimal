@@ -203,7 +203,7 @@ router.delete("/:id/dislike", authenticate, function (req, res, next) {
 		});
 });
 
-router.get("/:id/adoptions", async (req, res, next) => {
+router.get("/:id/adoptions", authenticate, async (req, res, next) => {
 	try {
 		const adoptions = await Adoption.find({ pet_id: req.params.id })
 			.populate("user_id")
