@@ -153,8 +153,8 @@ router.get("/:id/adoptions", authenticate, loadUserByRequestId, async (req, res,
 			return res.status(404).send("No adoptions found");
 		} else {
 			adoptions = adoptions.sort((a, b) => {
-				const dateA = a.messages.at(-1).date;
-				const dateB = b.messages.at(-1).date;
+				const dateA = a.messages.length > 0 ? a.messages.at(-1).date : new Date();
+				const dateB = b.messages.length > 0 ? b.messages.at(-1).date : new Date();
 				return dateA < dateB ? 1 : dateA > dateB ? -1 : 0;
 			});
 			res.status(200).send(adoptions);
