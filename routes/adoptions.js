@@ -70,7 +70,10 @@ router.get("/:id", authenticate, function (req, res, next) {
 			if (!adoption) {
 				return res.status(404).send("Adoption not found");
 			}
-			if (adoption.user_id._id.toString() !== req.currentUserId) {
+			if (
+				adoption.user_id._id.toString() !== req.currentUserId &&
+				adoption.pet_id.spa_id.user_id.toString() !== req.currentUserId
+			) {
 				return res.status(403).send("Unauthorized");
 			}
 			res.status(200).send(adoption);
