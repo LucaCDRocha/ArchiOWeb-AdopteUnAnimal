@@ -168,40 +168,25 @@ router.get("/:id/likes", authenticate, loadUserByRequestId, async (req, res, nex
 	try {
 		const user = req.user;
 
-		// Parse the "page" param (default to null if not provided)
-		let page = parseInt(req.query.page);
-		if (isNaN(page) || page < 1) {
-			page = null;
-		}
+		const page = parseInt(req.query.page) || 1;
+		const pageSize = parseInt(req.query.pageSize) || 0;
 
-		// Parse the "pageSize" param (default to null if not provided)
-		let pageSize = parseInt(req.query.pageSize);
-		if (isNaN(pageSize) || pageSize < 1) {
-			pageSize = null;
-		}
-
-		// Get the total number of likes
 		const totalLikes = user.likes.length;
+		const totalPages = Math.ceil(totalLikes / pageSize);
 
-		// Calculate the number of pages
-		const totalPages = pageSize ? Math.ceil(totalLikes / pageSize) : 1;
-
-		// Get the likes for the current page or all likes if no pagination
-		const likes = pageSize && page ? user.likes.slice((page - 1) * pageSize, page * pageSize) : user.likes;
-
-		// Fetch the pets and adoptions for the current page of likes
-		const pets = await Pet.find({ _id: { $in: likes } })
+		const pets = await Pet.find({ _id: { $in: user.likes } })
 			.populate([
 				{ path: "tags", model: "Tag" },
 				{ path: "spa_id", model: "Spa" },
 			])
+			.skip((page - 1) * pageSize)
+			.limit(pageSize)
 			.exec();
 
-		const adoptions = await Adoption.find({ pet_id: { $in: likes }, user_id: user._id }).exec();
-
+		const adoptions = await Adoption.find({ pet_id: { $in: user.likes }, user_id: user._id }).exec();
 		const paginatedPets = pets.map((pet) => {
 			const adoption = adoptions.find((adoption) => adoption.pet_id.equals(pet._id));
-			const newPet = {
+			return {
 				_id: pet._id,
 				nom: pet.nom,
 				age: pet.age,
@@ -213,22 +198,13 @@ router.get("/:id/likes", authenticate, loadUserByRequestId, async (req, res, nex
 				dislikes_count: pet.dislikes_count,
 				adoptionId: adoption ? adoption._id : null,
 			};
-			return newPet;
 		});
 
 		res.set("Pagination-Total-Likes", totalLikes);
 		res.set("Pagination-Total-Pages", totalPages);
-		res.set("Pagination-Page-Size", pageSize || totalLikes);
-		res.set("Pagination-Page", page || 1);
+		res.set("Pagination-Page-Size", pageSize);
+		res.set("Pagination-Page", page);
 
-		// Send response with paginated results or all results
-		// res.status(200).json({
-		// 	page: page || 1,
-		// 	pageSize: pageSize || totalLikes,
-		// 	totalLikes,
-		// 	totalPages,
-		// 	pets: paginatedPets,
-		// });
 		res.status(200).json(paginatedPets);
 	} catch (err) {
 		next(err);
