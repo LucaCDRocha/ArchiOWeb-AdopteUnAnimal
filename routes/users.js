@@ -55,7 +55,7 @@ router.post("/", async (req, res, next) => {
 
 router.put("/:id", authenticate, loadUserByRequestId, async (req, res, next) => {
 	if (req.currentUserId !== req.params.id) {
-		return res.sendStatus(403); // Forbidden
+		return res.status(403).send({ message: "You are not allowed to update this user" });
 	}
 
 	const user = req.user;
@@ -85,7 +85,7 @@ router.put("/:id", authenticate, loadUserByRequestId, async (req, res, next) => 
 
 router.delete("/:id", authenticate, loadUserByRequestId, async (req, res, next) => {
 	if (req.currentUserId !== req.params.id) {
-		return res.sendStatus(403); // Forbidden
+		return res.status(403).send({ message: "You are not allowed to delete this user" });
 	}
 
 	try {
@@ -110,7 +110,7 @@ router.delete("/:id", authenticate, loadUserByRequestId, async (req, res, next) 
 
 		// Delete user
 		await User.deleteOne({ _id: req.params.id });
-		res.sendStatus(204); // No Content
+		res.status(204);
 	} catch (err) {
 		next(err);
 	}
@@ -150,7 +150,7 @@ router.get("/:id/adoptions", authenticate, loadUserByRequestId, async (req, res,
 		}
 
 		if (adoptions.length === 0) {
-			return res.status(404).send("No adoptions found");
+			return res.status(404).send({ message: "No adoptions found" });
 		} else {
 			adoptions = adoptions.sort((a, b) => {
 				const dateA = a.messages.length > 0 ? a.messages.at(-1).date : new Date();
@@ -164,74 +164,63 @@ router.get("/:id/adoptions", authenticate, loadUserByRequestId, async (req, res,
 	}
 });
 
-router.get("/:id/likes", authenticate, loadUserByRequestId, async (req, res, next) => {
-    try {
-        const user = req.user;
+router.get("/:id/likes", authenticate, async (req, res, next) => {
+	try {
+		const user = await User.findById(req.params.id)
+			.populate({
+				path: "likes",
+				match: { isAdopted: false },
+				populate: [
+					{ path: "tags", model: "Tag" },
+					{ path: "spa_id", model: "Spa" },
+				],
+			})
+			.exec();
 
-        // Parse the "page" param (default to 1 if invalid)
-        let page = parseInt(req.query.page, 10);
-        if (isNaN(page) || page < 1) {
-            page = 1;
-        }
+		const page = parseInt(req.query.page) || 1;
+		const pageSize = parseInt(req.query.pageSize) || 0;
 
-        // Set the pageSize to 3
-        const pageSize = 3;
+		const totalLikes = user.likes.length;
+		const totalPages = pageSize > 0 ? Math.ceil(totalLikes / pageSize) : 0;
 
-        // Get the total number of likes
-        const totalLikes = user.likes.length;
+		const pets = await Pet.find({ _id: { $in: user.likes }, isAdopted: false })
+			.populate([
+				{ path: "tags", model: "Tag" },
+				{ path: "spa_id", model: "Spa" },
+			])
+			.skip((page - 1) * pageSize)
+			.limit(pageSize)
+			.exec();
 
-        // Calculate the number of pages
-        const totalPages = Math.ceil(totalLikes / pageSize);
+		const adoptions = await Adoption.find({ pet_id: { $in: user.likes }, user_id: user._id }).exec();
+		const paginatedPets = pets.map((pet) => {
+			const adoption = adoptions.find((adoption) => adoption.pet_id.equals(pet._id));
+			return {
+				_id: pet._id,
+				nom: pet.nom,
+				age: pet.age,
+				description: pet.description,
+				images: pet.images,
+				tags: pet.tags,
+				spa_id: pet.spa_id,
+				likes_count: pet.likes_count,
+				dislikes_count: pet.dislikes_count,
+				adoptionId: adoption ? adoption._id : null,
+			};
+		});
 
-        // Get the likes for the current page
-        const likes = user.likes.slice((page - 1) * pageSize, page * pageSize);
+		res.set("Pagination-Total-Likes", totalLikes);
+		res.set("Pagination-Total-Pages", totalPages);
+		res.set("Pagination-Page-Size", pageSize);
+		res.set("Pagination-Page", page);
 
-        // Fetch the pets and adoptions for the current page of likes
-        const pets = await Pet.find({ _id: { $in: likes } })
-            .populate([
-                { path: "tags", model: "Tag" },
-                { path: "spa_id", model: "Spa" },
-            ])
-            .exec();
-
-        const adoptions = await Adoption.find({ pet_id: { $in: likes }, user_id: user._id }).exec();
-
-        const paginatedPets = pets.map((pet) => {
-            const adoption = adoptions.find((adoption) => adoption.pet_id.equals(pet._id));
-            const newPet = {
-                _id: pet._id,
-                nom: pet.nom,
-                age: pet.age,
-                description: pet.description,
-                images: pet.images,
-                tags: pet.tags,
-                spa_id: pet.spa_id,
-                likes_count: pet.likes_count,
-                dislikes_count: pet.dislikes_count,
-                adoptionId: adoption ? adoption._id : null,
-            };
-            return newPet;
-        });
-
-        // Set pagination headers
-        res.set('Pagination-Page', page);
-        res.set('Pagination-PageSize', pageSize);
-        res.set('Pagination-Total', totalLikes);
-
-        // Send response with paginated results
-        res.status(200).json({
-            page,
-            pageSize,
-            totalLikes,
-            totalPages,
-            pets: paginatedPets,
-        });
-    } catch (err) {
-        next(err);
-    }
+		res.status(200).send(paginatedPets);
+	} catch (err) {
+		next(err);
+	}
 });
 
-router.get("/:id/dislikes", authenticate, loadUserByRequestId, async (req, res, next) => {
+router.get("/:id/dislikes", authenticate, async (req, res, next) => {
 	try {
 		const user = await User.findById(req.params.id)
 			.populate({
@@ -252,10 +241,10 @@ router.get("/:id/dislikes", authenticate, loadUserByRequestId, async (req, res, 
 router.post("/login", async (req, res, next) => {
 	try {
 		const user = await User.findOne({ email: req.body.email }).exec();
-		if (!user) return res.sendStatus(401); // Unauthorized
+		if (!user) return res.status(401).send({ message: "Invalid email or password" });
 
 		const valid = await bcrypt.compare(req.body.password, user.password);
-		if (!valid) return res.sendStatus(401); // Unauthorized
+		if (!valid) return res.status(401).send({ message: "Invalid email or password" });
 
 		const exp = Math.floor(Date.now() / 1000 + 60 * 60 * 24);
 		const token = await signJwt({ sub: user._id, exp: exp }, config.secret);

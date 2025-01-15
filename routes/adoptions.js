@@ -68,13 +68,13 @@ router.get("/:id", authenticate, function (req, res, next) {
 		.exec()
 		.then((adoption) => {
 			if (!adoption) {
-				return res.status(404).send("Adoption not found");
+				return res.status(404).send({ message: "Adoption not found" });
 			}
 			if (
 				adoption.user_id._id.toString() !== req.currentUserId &&
 				adoption.pet_id.spa_id.user_id.toString() !== req.currentUserId
 			) {
-				return res.status(403).send("Unauthorized");
+				return res.status(403).send({ message: "Unauthorized" });
 			}
 			res.status(200).send(adoption);
 		})
@@ -88,9 +88,9 @@ router.delete("/:id", authenticate, function (req, res, next) {
 		.exec()
 		.then((adoption) => {
 			if (!adoption) {
-				return res.status(404).send("Adoption not found");
+				return res.status(404).send({ message: "Adoption not found" });
 			}
-			res.sendStatus(204); // No Content
+			res.status(204);
 		})
 		.catch((err) => {
 			next(err);
@@ -103,7 +103,7 @@ router.get("/:id/messages", authenticate, function (req, res, next) {
 		.exec()
 		.then((adoption) => {
 			if (!adoption) {
-				return res.status(404).send("Adoption not found");
+				return res.status(404).send({ message: "Adoption not found" });
 			}
 			res.status(200).send(adoption.messages);
 		})
@@ -127,11 +127,11 @@ router.delete("/:id/messages/:msg_id", authenticate, function (req, res, next) {
 		.exec()
 		.then((adoption) => {
 			if (!adoption) {
-				return res.status(404).send("Adoption not found");
+				return res.status(404).send({ message: "Adoption not found" });
 			}
 			const messageIndex = adoption.messages.findIndex((msg) => msg._id.toString() === req.params.msg_id);
 			if (messageIndex === -1) {
-				return res.status(404).send("Message not found");
+				return res.status(404).send({ message: "Message not found" });
 			}
 			adoption.messages.splice(messageIndex, 1);
 			return adoption.save().then((updatedAdoption) => {
@@ -147,7 +147,7 @@ router.put("/:id/status", authenticate, async function (req, res, next) {
 	try {
 		const adoption = await Adoption.findById(req.params.id).exec();
 		if (!adoption) {
-			return res.status(404).send("Adoption not found");
+			return res.status(404).send({ message: "Adoption not found" });
 		}
 
 		adoption.status = req.body.status;

@@ -62,7 +62,7 @@ router.put("/:id", authenticate, loadSpaByRequestId, async function (req, res, n
 		res.status(200).send(updatedSpa);
 	} catch (err) {
 		if (err.code === 11000) {
-			res.status(409).send("Spa name already exists");
+			res.status(409).send({ message: "Spa name already exists" });
 		}
 		next(err);
 	}
@@ -71,7 +71,7 @@ router.put("/:id", authenticate, loadSpaByRequestId, async function (req, res, n
 router.delete("/:id", authenticate, loadSpaByRequestId, async function (req, res, next) {
 	try {
 		await req.spa.deleteOne();
-		res.sendStatus(204); // No Content
+		res.status(204);
 	} catch (err) {
 		next(err);
 	}
