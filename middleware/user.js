@@ -4,7 +4,7 @@ import Spa from "../models/spa.js";
 export async function loadUserByRequestId(req, res, next) {
 	const user = await User.findById(req.params.id);
 	if (user === null) {
-		return res.status(404);
+		return res.status(404).send("User not found");
 	}
 
 	req.user = user;

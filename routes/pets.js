@@ -105,7 +105,7 @@ router.delete("/:id", authenticate, checkSpaLink, function (req, res, next) {
 			return Adoption.deleteMany({ pet_id: req.params.id }).exec();
 		})
 		.then(() => {
-			res.status(204); // No Content
+			res.status(204);
 		})
 		.catch((err) => {
 			next(err);

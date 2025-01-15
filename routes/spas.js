@@ -71,7 +71,7 @@ router.put("/:id", authenticate, loadSpaByRequestId, async function (req, res, n
 router.delete("/:id", authenticate, loadSpaByRequestId, async function (req, res, next) {
 	try {
 		await req.spa.deleteOne();
-		res.status(204); // No Content
+		res.status(204);
 	} catch (err) {
 		next(err);
 	}
