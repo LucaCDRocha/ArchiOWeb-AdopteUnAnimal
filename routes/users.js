@@ -164,12 +164,24 @@ router.get("/:id/adoptions", authenticate, loadUserByRequestId, async (req, res,
 	}
 });
 
-router.get("/:id/likes", authenticate, loadUserByRequestId, async (req, res, next) => {
+router.get("/:id/likes", authenticate, async (req, res, next) => {
 	try {
-		const user = req.user;
+		const user = await User.findById(req.params.id)
+			.populate({
+				path: "likes",
+				match: { isAdopted: false },
+				populate: [
+					{ path: "tags", model: "Tag" },
+					{ path: "spa_id", model: "Spa" },
+				],
+			})
+			.exec();
 
 		const page = parseInt(req.query.page) || 1;
 		const pageSize = parseInt(req.query.pageSize) || 0;
+
+		const totalLikes = user.likes.length;
+		const totalPages = pageSize > 0 ? Math.ceil(totalLikes / pageSize) : 0;
 
 		const pets = await Pet.find({ _id: { $in: user.likes }, isAdopted: false })
 			.populate([
@@ -179,9 +191,6 @@ router.get("/:id/likes", authenticate, loadUserByRequestId, async (req, res, nex
 			.skip((page - 1) * pageSize)
 			.limit(pageSize)
 			.exec();
-
-		const totalLikes = pets.length;
-		const totalPages = pageSize > 0 ? Math.ceil(totalLikes / pageSize) : 0;
 
 		const adoptions = await Adoption.find({ pet_id: { $in: user.likes }, user_id: user._id }).exec();
 		const paginatedPets = pets.map((pet) => {
@@ -211,7 +220,7 @@ router.get("/:id/likes", authenticate, loadUserByRequestId, async (req, res, nex
 	}
 });
 
-router.get("/:id/dislikes", authenticate, loadUserByRequestId, async (req, res, next) => {
+router.get("/:id/dislikes", authenticate, async (req, res, next) => {
 	try {
 		const user = await User.findById(req.params.id)
 			.populate({
