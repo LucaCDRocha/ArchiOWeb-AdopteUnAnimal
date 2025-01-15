@@ -183,7 +183,7 @@ router.get("/:id/likes", authenticate, async (req, res, next) => {
 		const totalLikes = user.likes.length;
 		const totalPages = pageSize > 0 ? Math.ceil(totalLikes / pageSize) : 0;
 
-		const pets = await Pet.aggregate([
+		const queryAggregation = [
 			{ $match: { _id: { $in: user.likes }, isAdopted: false } },
 			{
 				$lookup: {
@@ -226,9 +226,14 @@ router.get("/:id/likes", authenticate, async (req, res, next) => {
 					adoptionStatus: { $arrayElemAt: ["$adoption.status", 0] },
 				},
 			},
-			{ $skip: (page - 1) * pageSize },
-			{ $limit: pageSize },
-		]).exec();
+		];
+
+		if (pageSize > 0) {
+			queryAggregation.push({ $skip: (page - 1) * pageSize });
+			queryAggregation.push({ $limit: pageSize });
+		}
+
+		const pets = await Pet.aggregate(queryAggregation).exec();
 
 		// .find({ _id: { $in: user.likes }, isAdopted: false })
 		// .populate([
