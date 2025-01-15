@@ -15,7 +15,7 @@ router.get("/", authenticate, function (req, res, next) {
 		.exec()
 		.then((user) => {
 			if (!user) {
-				return res.status(404).send("User not found");
+				return res.status(404).send({ message: "User not found" });
 			}
 			const excludedPets = [...user.likes, ...user.dislikes];
 			const tagFilter = req.query.tags ? { tags: { $all: req.query.tags.split(",") } } : {};
@@ -53,7 +53,7 @@ router.get("/:id", authenticate, function (req, res, next) {
 		.exec()
 		.then((pet) => {
 			if (!pet) {
-				return res.status(404).send("Pet not found");
+				return res.status(404).send({ message: "Pet not found" });
 			}
 			res.status(200).send(pet);
 		})
@@ -84,7 +84,7 @@ router.put("/:id", authenticate, checkSpaLink, function (req, res, next) {
 		.exec()
 		.then((pet) => {
 			if (!pet) {
-				return res.status(404).send("Pet not found");
+				return res.status(404).send({ message: "Pet not found" });
 			}
 			res.status(200).send(pet);
 		})
@@ -98,7 +98,7 @@ router.delete("/:id", authenticate, checkSpaLink, function (req, res, next) {
 		.exec()
 		.then((pet) => {
 			if (!pet) {
-				return res.status(404).send("Pet not found");
+				return res.status(404).send({ message: "Pet not found" });
 			}
 			// Cascade delete adoptions related to the pet
 			User.updateMany({ likes: req.params.id }, { $pull: { likes: req.params.id } }).exec();
@@ -117,7 +117,7 @@ router.put("/:id/like", authenticate, function (req, res, next) {
 		.exec()
 		.then((pet) => {
 			if (!pet) {
-				return res.status(404).send("Pet not found");
+				return res.status(404).send({ message: "Pet not found" });
 			}
 			User.findByIdAndUpdate(req.currentUserId, { $addToSet: { likes: pet._id } }, { new: true })
 				.exec()
@@ -138,7 +138,7 @@ router.delete("/:id/like", authenticate, function (req, res, next) {
 		.exec()
 		.then((pet) => {
 			if (!pet) {
-				return res.status(404).send("Pet not found");
+				return res.status(404).send({ message: "Pet not found" });
 			}
 			User.findByIdAndUpdate(req.currentUserId, { $pull: { likes: pet._id } }, { new: true })
 				.exec()
@@ -166,7 +166,7 @@ router.put("/:id/dislike", authenticate, function (req, res, next) {
 		.exec()
 		.then((pet) => {
 			if (!pet) {
-				return res.status(404).send("Pet not found");
+				return res.status(404).send({ message: "Pet not found" });
 			}
 			User.findByIdAndUpdate(req.currentUserId, { $addToSet: { dislikes: pet._id } }, { new: true })
 				.exec()
@@ -187,7 +187,7 @@ router.delete("/:id/dislike", authenticate, function (req, res, next) {
 		.exec()
 		.then((pet) => {
 			if (!pet) {
-				return res.status(404).send("Pet not found");
+				return res.status(404).send({ message: "Pet not found" });
 			}
 			User.findByIdAndUpdate(req.currentUserId, { $pull: { dislikes: pet._id } }, { new: true })
 				.exec()

@@ -55,7 +55,7 @@ router.post("/", async (req, res, next) => {
 
 router.put("/:id", authenticate, loadUserByRequestId, async (req, res, next) => {
 	if (req.currentUserId !== req.params.id) {
-		return res.status(403); // Forbidden
+		return res.status(403).send({ message: "You are not allowed to update this user" });
 	}
 
 	const user = req.user;
@@ -85,7 +85,7 @@ router.put("/:id", authenticate, loadUserByRequestId, async (req, res, next) => 
 
 router.delete("/:id", authenticate, loadUserByRequestId, async (req, res, next) => {
 	if (req.currentUserId !== req.params.id) {
-		return res.status(403); // Forbidden
+		return res.status(403).send({ message: "You are not allowed to delete this user" });
 	}
 
 	try {
@@ -110,7 +110,7 @@ router.delete("/:id", authenticate, loadUserByRequestId, async (req, res, next) 
 
 		// Delete user
 		await User.deleteOne({ _id: req.params.id });
-		res.status(204); // No Content
+		res.status(204);
 	} catch (err) {
 		next(err);
 	}
@@ -150,7 +150,7 @@ router.get("/:id/adoptions", authenticate, loadUserByRequestId, async (req, res,
 		}
 
 		if (adoptions.length === 0) {
-			return res.status(404).send("No adoptions found");
+			return res.status(404).send({ message: "No adoptions found" });
 		} else {
 			adoptions = adoptions.sort((a, b) => {
 				const dateA = a.messages.length > 0 ? a.messages.at(-1).date : new Date();
@@ -214,7 +214,7 @@ router.get("/:id/likes", authenticate, async (req, res, next) => {
 		res.set("Pagination-Page-Size", pageSize);
 		res.set("Pagination-Page", page);
 
-		res.status(200).json(paginatedPets);
+		res.status(200).send(paginatedPets);
 	} catch (err) {
 		next(err);
 	}
@@ -241,10 +241,10 @@ router.get("/:id/dislikes", authenticate, async (req, res, next) => {
 router.post("/login", async (req, res, next) => {
 	try {
 		const user = await User.findOne({ email: req.body.email }).exec();
-		if (!user) return res.status(401); // Unauthorized
+		if (!user) return res.status(401).send({ message: "Invalid email or password" });
 
 		const valid = await bcrypt.compare(req.body.password, user.password);
-		if (!valid) return res.status(401); // Unauthorized
+		if (!valid) return res.status(401).send({ message: "Invalid email or password" });
 
 		const exp = Math.floor(Date.now() / 1000 + 60 * 60 * 24);
 		const token = await signJwt({ sub: user._id, exp: exp }, config.secret);
