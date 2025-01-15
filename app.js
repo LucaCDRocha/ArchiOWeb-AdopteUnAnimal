@@ -24,9 +24,9 @@ app.use(
 		optionsSuccessStatus: 200,
 		exposedHeaders: [
             'Pagination-Page',
-            'Pagination-Pages-Size',
-            'Pagination-Total',
-            'Pagination-Total-Count',
+            'Pagination-Page-Size',
+            'Pagination-Total-Pages',
+            'Pagination-Total-Likes',
         ],
 	})
 );
