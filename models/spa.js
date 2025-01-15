@@ -2,8 +2,10 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 const spaSchema = new Schema({
-	nom: String,
-	place: String,
+	nom: { type: String, required: true },
+	adresse: { type: String, unique: true, required: true },
+	latitude: { type: String, required: true },
+	longitude: { type: String, required: true },
 	user_id: { type: mongoose.Types.ObjectId, ref: "User" },
 });
 
