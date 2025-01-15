@@ -171,10 +171,7 @@ router.get("/:id/likes", authenticate, loadUserByRequestId, async (req, res, nex
 		const page = parseInt(req.query.page) || 1;
 		const pageSize = parseInt(req.query.pageSize) || 0;
 
-		const totalLikes = user.likes.length;
-		const totalPages = Math.ceil(totalLikes / pageSize);
-
-		const pets = await Pet.find({ _id: { $in: user.likes } })
+		const pets = await Pet.find({ _id: { $in: user.likes }, isAdopted: false })
 			.populate([
 				{ path: "tags", model: "Tag" },
 				{ path: "spa_id", model: "Spa" },
@@ -182,6 +179,9 @@ router.get("/:id/likes", authenticate, loadUserByRequestId, async (req, res, nex
 			.skip((page - 1) * pageSize)
 			.limit(pageSize)
 			.exec();
+
+		const totalLikes = pets.length;
+		const totalPages = pageSize > 0 ? Math.ceil(totalLikes / pageSize) : 0;
 
 		const adoptions = await Adoption.find({ pet_id: { $in: user.likes }, user_id: user._id }).exec();
 		const paginatedPets = pets.map((pet) => {
