@@ -55,7 +55,7 @@ router.post("/", async (req, res, next) => {
 
 router.put("/:id", authenticate, loadUserByRequestId, async (req, res, next) => {
 	if (req.currentUserId !== req.params.id) {
-		return res.sendStatus(403); // Forbidden
+		return res.status(403); // Forbidden
 	}
 
 	const user = req.user;
@@ -85,7 +85,7 @@ router.put("/:id", authenticate, loadUserByRequestId, async (req, res, next) => 
 
 router.delete("/:id", authenticate, loadUserByRequestId, async (req, res, next) => {
 	if (req.currentUserId !== req.params.id) {
-		return res.sendStatus(403); // Forbidden
+		return res.status(403); // Forbidden
 	}
 
 	try {
@@ -110,7 +110,7 @@ router.delete("/:id", authenticate, loadUserByRequestId, async (req, res, next) 
 
 		// Delete user
 		await User.deleteOne({ _id: req.params.id });
-		res.sendStatus(204); // No Content
+		res.status(204); // No Content
 	} catch (err) {
 		next(err);
 	}
@@ -232,10 +232,10 @@ router.get("/:id/dislikes", authenticate, loadUserByRequestId, async (req, res, 
 router.post("/login", async (req, res, next) => {
 	try {
 		const user = await User.findOne({ email: req.body.email }).exec();
-		if (!user) return res.sendStatus(401); // Unauthorized
+		if (!user) return res.status(401); // Unauthorized
 
 		const valid = await bcrypt.compare(req.body.password, user.password);
-		if (!valid) return res.sendStatus(401); // Unauthorized
+		if (!valid) return res.status(401); // Unauthorized
 
 		const exp = Math.floor(Date.now() / 1000 + 60 * 60 * 24);
 		const token = await signJwt({ sub: user._id, exp: exp }, config.secret);

@@ -101,11 +101,11 @@ router.delete("/:id", authenticate, checkSpaLink, function (req, res, next) {
 				return res.status(404).send("Pet not found");
 			}
 			// Cascade delete adoptions related to the pet
-			User.updateMany({ likes: req.params.id }, { $pull: { likes: req.params.id } }).exec()
+			User.updateMany({ likes: req.params.id }, { $pull: { likes: req.params.id } }).exec();
 			return Adoption.deleteMany({ pet_id: req.params.id }).exec();
 		})
 		.then(() => {
-			res.sendStatus(204); // No Content
+			res.status(204); // No Content
 		})
 		.catch((err) => {
 			next(err);
@@ -146,7 +146,7 @@ router.delete("/:id/like", authenticate, function (req, res, next) {
 					Adoption.findOneAndDelete({ pet_id: req.params.id, user_id: req.currentUserId })
 						.exec()
 						.then(() => {
-							res.sendStatus(204);
+							res.status(204);
 						})
 						.catch((err) => {
 							next(err);
