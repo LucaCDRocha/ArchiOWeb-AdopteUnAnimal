@@ -6,7 +6,7 @@ import yaml from "js-yaml";
 import swaggerUi from "swagger-ui-express";
 import * as config from "./config.js";
 
-import mongoose, { set } from "mongoose";
+import mongoose from "mongoose";
 mongoose.connect(config.databaseUrl);
 
 import indexRouter from "./routes/index.js";
@@ -22,16 +22,12 @@ app.use(
 	cors({
 		origin: config.corsOrigin,
 		optionsSuccessStatus: 200,
-		allowedHeaders: [
-			"Content-Type",
-			"Authorization",
-			"X-Requested-With",
-			"Accept",
-			"Pagination-Total-Likes",
-			"Pagination-Total-Pages",
-			"Pagination-Page-Size",
-			"Pagination-Page",
-		],
+		exposedHeaders: [
+            'Pagination-Page',
+            'Pagination-Pages-Size',
+            'Pagination-Total',
+            'Pagination-Total-Count',
+        ],
 	})
 );
 // Parse the OpenAPI document.
