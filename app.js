@@ -22,16 +22,6 @@ app.use(
 	cors({
 		origin: config.corsOrigin,
 		optionsSuccessStatus: 200,
-		allowedHeaders: [
-			"Content-Type",
-			"Authorization",
-			"X-Requested-With",
-			"Accept",
-			"Pagination-Total-Likes",
-			"Pagination-Total-Pages",
-			"Pagination-Page-Size",
-			"Pagination-Page",
-		],
 	})
 );
 // Parse the OpenAPI document.
