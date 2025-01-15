@@ -266,10 +266,12 @@ router.get("/:id/likes", authenticate, async (req, res, next) => {
 		// 	}
 		// });
 
-		res.set("Pagination-Total-Likes", totalLikes);
-		res.set("Pagination-Total-Pages", totalPages);
-		res.set("Pagination-Page-Size", pageSize);
-		res.set("Pagination-Page", page);
+		res.set({
+			"Pagination-Total-Likes": totalLikes,
+			"Pagination-Total-Pages": totalPages,
+			"Pagination-Page-Size": pageSize,
+			"Pagination-Page": page,
+		});
 
 		res.status(200).send(pets);
 	} catch (err) {
