@@ -7,7 +7,7 @@
 	},
 	"servers": [
 	  {
-		"url": "https://www.test.ch/api/"
+		"url": "https://archioweb-adopteunanimal.onrender.com/"
 	  }
 	],
 	"tags": [
@@ -849,6 +849,39 @@
 			}
 		  }
 		}
+	  },
+	  "/tags": {
+		"get": {
+		  "tags": ["tags"],
+		  "summary": "Liste tous les tags",
+		  "responses": {
+			"200": {
+			  "description": "Liste des tags",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"type": "array",
+					"items": {
+					  "$ref": "#/components/schemas/Tag"
+					}
+				  }
+				}
+			  }
+			},
+			"400": {
+			  "description": "Requête invalide"
+			},
+			"401": {
+			  "description": "Non autorisé"
+			},
+			"404": {
+			  "description": "Non trouvé"
+			},
+			"500": {
+			  "description": "Erreur interne du serveur"
+			}
+		  }
+		}
 	  }
 	},
 	"components": {
@@ -862,29 +895,44 @@
 			"nom": {
 			  "type": "string"
 			},
+			"age": {
+			  "type": "integer"
+			},
 			"description": {
 			  "type": "string"
 			},
 			"images": {
 			  "type": "array",
 			  "items": {
-				"$ref": "#/components/schemas/Images"
+				"type": "object",
+				"properties": {
+				  "data": {
+					"type": "string",
+					"format": "byte"
+				  },
+				  "imgType": {
+					"type": "string"
+				  }
+				}
 			  }
 			},
 			"tags": {
 			  "type": "array",
 			  "items": {
-				"$ref": "#/components/schemas/Id"
+				"$ref": "#/components/schemas/Tag"
 			  }
 			},
 			"spa_id": {
-			  "type": "string"
+			  "$ref": "#/components/schemas/Spa"
 			},
 			"likes_count": {
 			  "type": "integer"
 			},
 			"dislikes_count": {
 			  "type": "integer"
+			},
+			"isAdopted": {
+			  "type": "boolean"
 			}
 		  }
 		},
@@ -914,26 +962,28 @@
 			"email": {
 			  "type": "string"
 			},
-			"password": {
-			  "type": "string"
-			},
 			"likes": {
 			  "type": "array",
 			  "items": {
-				"$ref": "#/components/schemas/Id"
+				"$ref": "#/components/schemas/Pet"
 			  }
 			},
 			"dislikes": {
 			  "type": "array",
 			  "items": {
-				"$ref": "#/components/schemas/Id"
+				"$ref": "#/components/schemas/Pet"
 			  }
+			}
+		  }
+		},
+		"Tag": {
+		  "type": "object",
+		  "properties": {
+			"_id": {
+			  "type": "string"
 			},
-			"adoptions": {
-			  "type": "array",
-			  "items": {
-				"$ref": "#/components/schemas/Id"
-			  }
+			"nom": {
+			  "type": "string"
 			}
 		  }
 		},
@@ -946,7 +996,13 @@
 			"nom": {
 			  "type": "string"
 			},
-			"place": {
+			"adresse": {
+			  "type": "string"
+			},
+			"latitude": {
+			  "type": "string"
+			},
+			"longitude": {
 			  "type": "string"
 			},
 			"user_id": {
@@ -965,15 +1021,34 @@
 			  "format": "date-time"
 			},
 			"user_id": {
-			  "type": "string"
+			  "$ref": "#/components/schemas/User"
 			},
 			"pet_id": {
-			  "type": "string"
+			  "$ref": "#/components/schemas/Pet"
+			},
+			"status": {
+			  "type": "string",
+			  "enum": ["pending", "accepted", "rejected"]
 			},
 			"messages": {
 			  "type": "array",
 			  "items": {
-				"$ref": "#/components/schemas/Message"
+				"type": "object",
+				"properties": {
+				  "_id": {
+					"type": "string"
+				  },
+				  "content": {
+					"type": "string"
+				  },
+				  "date": {
+					"type": "string",
+					"format": "date-time"
+				  },
+				  "user_id": {
+					"$ref": "#/components/schemas/User"
+				  }
+				}
 			  }
 			}
 		  }
