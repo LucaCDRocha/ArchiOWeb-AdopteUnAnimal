@@ -90,27 +90,26 @@ router.delete("/:id", authenticate, loadUserByRequestId, async (req, res, next) 
 
 	try {
 		// Delete user's adoptions
-		await Adoption.deleteMany({ user_id: req.params.id });
-
+		await Adoption.deleteMany({ user_id: req.currentUserId });
+		
 		// Delete user's likes
-		const user = await User.findById(req.params.id).exec();
-		if (user.likes && user.likes.length > 0) {
-			await Pet.updateMany({ _id: { $in: user.likes } }, { $inc: { likes_count: -1 } });
+		if (req.user.likes && req.user.likes.length > 0) {
+			await Pet.updateMany({ _id: { $in: req.user.likes } }, { $inc: { likes_count: -1 } });
 		}
-
+		
 		// Check if user is part of a spa and delete pets if so
-		const spa = await Spa.findOne({ user_id: req.params.id }).exec();
+		const spa = await Spa.findOne({ user_id: req.currentUserId }).exec();
 		if (spa) {
 			const pets = await Pet.find({ spa_id: spa._id }).exec();
 			const petIds = pets.map((pet) => pet._id);
-			await Pet.deleteMany({ _id: { $in: petIds } });
+			await Pet.deleteMany({ spa_id: spa._id });
 			await Adoption.deleteMany({ pet_id: { $in: petIds } });
 			await Spa.deleteOne({ _id: spa._id });
 		}
 
 		// Delete user
-		await User.deleteOne({ _id: req.params.id });
-		res.status(204);
+		await User.deleteOne({ _id: req.currentUserId });
+		res.sendStatus(204);
 	} catch (err) {
 		next(err);
 	}

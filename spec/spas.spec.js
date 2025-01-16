@@ -27,7 +27,7 @@ beforeEach(async () => {
     await newSuperUser.save();
     superUser = newSuperUser;
 
-    spa = new Spa({ nom: "SPA1", adresse: "Address1", latitude: "45.0", longitude: "90.0" });
+    spa = new Spa({ nom: "SPA1", adresse: "Address1", latitude: "45.0", longitude: "90.0", user_id: superUser._id });
     await spa.save();
 
     // Log in as the superuser to get a token
