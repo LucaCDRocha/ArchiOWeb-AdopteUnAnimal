@@ -15,7 +15,7 @@ export async function checkSpaLink(req, res, next) {
 	try {
 		const spa = await Spa.findOne({ user_id: req.currentUserId }).exec();
 		if (!spa) {
-			return res.status(403).send({ message: "You are not allowed to add pets" });
+			return res.status(403).send({ message: "You don't have a relation to a spa" });
 		}
 		req.spa = spa;
 		next();

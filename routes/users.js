@@ -235,42 +235,6 @@ router.get("/:id/likes", authenticate, async (req, res, next) => {
 
 		const pets = await Pet.aggregate(queryAggregation).exec();
 
-		// .find({ _id: { $in: user.likes }, isAdopted: false })
-		// .populate([
-		// 	{ path: "tags", model: "Tag" },
-		// 	{ path: "spa_id", model: "Spa" },
-		// ])
-		// .skip((page - 1) * pageSize)
-		// .limit(pageSize)
-		// .exec();
-
-		// const paginatedPets = pets.map((pet) => {
-		// 	const adoption = adoptions.find((adoption) => adoption.pet_id.equals(pet._id));
-		// 	return {
-		// 		_id: pet._id,
-		// 		nom: pet.nom,
-		// 		age: pet.age,
-		// 		description: pet.description,
-		// 		images: pet.images,
-		// 		tags: pet.tags,
-		// 		spa_id: pet.spa_id,
-		// 		likes_count: pet.likes_count,
-		// 		dislikes_count: pet.dislikes_count,
-		// 		adoptionId: adoption ? adoption._id : null,
-		// 	};
-		// });
-
-		// delete pet from paginatedPets if the status is not pending or if the adoption is not found
-		// paginatedPets.forEach((pet) => {
-		// 	if (!pet.adoptionId) {
-		// 		return;
-		// 	}
-		// 	const adoption = adoptions.find((adoption) => adoption._id.equals(pet.adoptionId));
-		// 	if (adoption.status !== "pending") {
-		// 		paginatedPets.splice(paginatedPets.indexOf(pet));
-		// 	}
-		// });
-
 		res.set({
 			"Pagination-Total-Likes": totalLikes,
 			"Pagination-Total-Pages": totalPages,
