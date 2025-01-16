@@ -3,6 +3,9 @@ import { authenticate } from "../middleware/auth.js";
 import { loadSpaByRequestId } from "../middleware/spa.js";
 import Spa from "../models/spa.js";
 import Pet from "../models/pet.js";
+import Adoption from "../models/adoption.js";
+import User from "../models/user.js";
+import { checkSpaLink } from "../middleware/user.js";
 
 const router = express.Router();
 
@@ -68,10 +71,30 @@ router.put("/:id", authenticate, loadSpaByRequestId, async function (req, res, n
 	}
 });
 
-router.delete("/:id", authenticate, loadSpaByRequestId, async function (req, res, next) {
+router.delete("/:id", authenticate, loadSpaByRequestId, checkSpaLink, async function (req, res, next) {
 	try {
+		const spaId = req.spa._id;
+		// Delete pets associated with the spa
+		const pets = await Pet.find({ spa_id: spaId });
+		const petIds = pets.map(pet => pet._id);
+		await Pet.deleteMany({ spa_id: spaId });
+
+		// Delete adoptions associated with the pets
+		await Adoption.deleteMany({ pet_id: { $in: petIds } });
+
+		// Remove pet ids from users' likes and dislikes
+		await User.updateMany(
+			{ likes: { $in: petIds } },
+			{ $pull: { likes: { $in: petIds } } }
+		);
+		await User.updateMany(
+			{ dislikes: { $in: petIds } },
+			{ $pull: { dislikes: { $in: petIds } } }
+		);
+
+		// Delete the spa
 		await req.spa.deleteOne();
-		res.status(204);
+		res.sendStatus(204);
 	} catch (err) {
 		next(err);
 	}
