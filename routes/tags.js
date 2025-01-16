@@ -9,7 +9,7 @@ router.get("/", function (req, res, next) {
         .sort("name")
         .exec()
         .then((tags) => {
-            res.send(tags);
+            res.status(200).send(tags);
         })
         .catch((err) => {
             next(err);

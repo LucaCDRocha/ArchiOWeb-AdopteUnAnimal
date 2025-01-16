@@ -13,8 +13,9 @@ const petSchema = new Schema({
   ],
   tags: [{ type: mongoose.Types.ObjectId, ref: "Tag" }],
   spa_id: { type: mongoose.Types.ObjectId, ref: "Spa" },
-  likes_count: Number,
-  dislikes_count: Number,
+  likes_count: { type: Number, default: 0 },
+  dislikes_count: { type: Number, default: 0 },
+  isAdopted: { type: Boolean, default: false },
 });
 
 const Pet = mongoose.model("Pet", petSchema);

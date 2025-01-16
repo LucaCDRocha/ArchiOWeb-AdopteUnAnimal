@@ -5,7 +5,7 @@ const router = express.Router();
 router.get("/", function (req, res, next) {
   Pet.find()
     .then((pets) => {
-      res.send(
+      res.status(200).send(
         `<img src="data:image/jpeg;base64,${pets[0].images[0].data.toString(
           "base64"
         )}" alt="Pet Image" height="50%">`

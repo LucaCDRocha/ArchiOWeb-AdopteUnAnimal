@@ -5,6 +5,7 @@ import http from "node:http";
 
 import app from "../app.js";
 import * as config from "../config.js";
+import { setupWebSocketServer } from "../websocket.js"; // Import the WebSocket setup function
 
 const debug = createDebugger("ArchiOWeb-AdopteUnAnimal:server");
 
@@ -14,6 +15,9 @@ app.set("port", port);
 
 // Create HTTP server
 const httpServer = http.createServer(app);
+
+// Create WebSocket server
+setupWebSocketServer(httpServer); // Setup WebSocket server
 
 // Listen on provided port, on all network interfaces
 httpServer.listen(port);
