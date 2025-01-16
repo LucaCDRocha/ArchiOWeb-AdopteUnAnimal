@@ -30,13 +30,23 @@ router.get("/:id", authenticate, loadSpaByRequestId, function (req, res, next) {
 });
 
 router.post("/", authenticate, function (req, res, next) {
-	const newSpa = new Spa(req.body);
-	newSpa
+	const spa = new Spa({
+		nom: req.body.nom,
+		adresse: req.body.adresse,
+		latitude: req.body.latitude,
+		longitude: req.body.longitude,
+		user_id: req.currentUserId,
+	});
+
+	spa
 		.save()
-		.then((spa) => {
-			res.status(201).send(spa);
+		.then((newSpa) => {
+			res.status(201).send(newSpa);
 		})
 		.catch((err) => {
+			if (err.code === 11000) {
+				res.status(409).send("Spa name already exists");
+			}
 			next(err);
 		});
 });

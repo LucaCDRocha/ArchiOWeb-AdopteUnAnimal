@@ -4,6 +4,7 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
+		"test": "cross-env DATABASE_URL=mongodb://127.0.0.1/my-app-test node --experimental-vm-modules node_modules/jest/bin/jest.js",
 		"dev": "nodemon",
 		"start": "node ./bin/start",
 		"seed": "node ./seeders/seeder.js"
@@ -16,7 +17,6 @@
 		"express": "^4.21.0",
 		"http-errors": "^2.0.0",
 		"js-yaml": "^4.1.0",
-		"jsonwebtoken": "^9.0.2",
 		"mongoose": "^8.8.1",
 		"morgan": "^1.10.0",
 		"sharp": "^0.33.5",
@@ -24,9 +24,15 @@
 		"ws": "^8.12.0"
 	},
 	"devDependencies": {
+		"jest": "^29.7.0",
 		"cross-env": "^7.0.3",
 		"dotenv": "^16.4.5",
 		"nodemon": "^3.1.7",
 		"supertest": "^7.0.0"
+	},
+	"jest": {
+		"verbose": true,
+		"maxWorkers": 1,
+		"forceExit": true
 	}
 }
