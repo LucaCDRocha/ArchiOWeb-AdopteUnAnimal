@@ -105,7 +105,7 @@ router.delete("/:id", authenticate, checkSpaLink, function (req, res, next) {
 			return Adoption.deleteMany({ pet_id: req.params.id }).exec();
 		})
 		.then(() => {
-			res.status(204);
+			res.sendStatus(204);
 		})
 		.catch((err) => {
 			next(err);
@@ -146,7 +146,7 @@ router.delete("/:id/like", authenticate, function (req, res, next) {
 					Adoption.findOneAndDelete({ pet_id: req.params.id, user_id: req.currentUserId })
 						.exec()
 						.then(() => {
-							res.status(204);
+							res.sendStatus(204);
 						})
 						.catch((err) => {
 							next(err);

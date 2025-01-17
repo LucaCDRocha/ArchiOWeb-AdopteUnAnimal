@@ -5,7 +5,7 @@ const adoptionSchema = new Schema({
 	date: Date,
 	user_id: { type: mongoose.Types.ObjectId, ref: "User" },
 	pet_id: { type: mongoose.Types.ObjectId, ref: "Pet" },
-	status: { type: String, enum: ["pending", "accepted", "rejected"], default: "pending" },
+	status: { type: String, enum: ["pending", "accepted", "rejected", "unavailable"], default: "pending" },
 	messages: [
 		{
 			_id: { type: mongoose.Types.ObjectId, default: () => new mongoose.Types.ObjectId() },
