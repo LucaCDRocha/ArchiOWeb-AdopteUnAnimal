@@ -61,6 +61,17 @@ describe("Users API, create user", () => {
         const res = await request(app).post("/users").send(newUser);
         expect(res.statusCode).toEqual(201);
         expect(res.body).toHaveProperty("_id");
+        expect(res.body).toHaveProperty("firstName", "John");
+        expect(res.body).toHaveProperty("lastName", "Doe");
+        expect(res.body).toHaveProperty("email", "john.doe@example.com");
+        expect(res.body).not.toHaveProperty("password"); // Password should not be returned
+    });
+
+    it("should not create a user with an existing email", async () => {
+        const newUser = { firstName: "John", lastName: "Doe", email: "admin@example.com", password: "password" };
+        const res = await request(app).post("/users").send(newUser);
+        expect(res.statusCode).toEqual(409);
+        expect(res.body).toHaveProperty("message", "Email already exists");
     });
 });
 
@@ -81,6 +92,21 @@ describe("Users API, update user", () => {
             .send(updateBody);
         expect(res.statusCode).toEqual(200);
         expect(res.body).toHaveProperty("firstName", "Jane");
+        expect(res.body).toHaveProperty("lastName", "Doe");
+        expect(res.body).toHaveProperty("email", "jane.doe@example.com");
+    });
+
+    it("should not update a user with an existing email", async () => {
+        const newUser = { firstName: "John", lastName: "Smith", email: "john.smith@example.com", password: "password" };
+        await request(app).post("/users").send(newUser);
+
+        const updateBody = { firstName: "Jane", lastName: "Doe", email: "john.smith@example.com", password: "password" };
+        const res = await request(app)
+            .put(`/users/${superUser._id}`)
+            .set("Authorization", `Bearer ${superUserToken}`)
+            .send(updateBody);
+        expect(res.statusCode).toEqual(409);
+        expect(res.body).toHaveProperty("message", "Email already exists");
     });
 });
 
@@ -88,5 +114,13 @@ describe("Users API, delete user", () => {
     it("should delete a user by ID", async () => {
         const res = await request(app).delete(`/users/${superUser._id}`).set("Authorization", `Bearer ${superUserToken}`);
         expect(res.statusCode).toEqual(204);
+    });
+
+    it("should not delete a user without authorization", async () => {
+        const newUser = { firstName: "John", lastName: "Doe", email: "john.doe@example.com", password: "password" };
+        const createdUser = await request(app).post("/users").send(newUser);
+
+        const res = await request(app).delete(`/users/${createdUser.body._id}`);
+        expect(res.statusCode).toEqual(401);
     });
 });

@@ -47,6 +47,8 @@ describe("Spas API, get spas", () => {
         const res = await request(app).get("/spas").set("Authorization", `Bearer ${superUserToken}`);
         expect(res.statusCode).toEqual(200);
         expect(res.body).toBeInstanceOf(Array);
+        expect(res.body.length).toBeGreaterThan(0);
+        expect(res.body[0]).toHaveProperty("nom", spa.nom);
     });
 });
 
@@ -56,6 +58,11 @@ describe("Spas API, create spa", () => {
         const res = await request(app).post("/spas").set("Authorization", `Bearer ${superUserToken}`).send(newSpa);
         expect(res.statusCode).toEqual(201);
         expect(res.body).toHaveProperty("_id");
+        expect(res.body).toHaveProperty("nom", newSpa.nom);
+
+        const spaInDb = await Spa.findById(res.body._id);
+        expect(spaInDb).not.toBeNull();
+        expect(spaInDb.nom).toEqual(newSpa.nom);
     });
 });
 
@@ -65,6 +72,7 @@ describe("Spas API, get by ID", () => {
         const res = await request(app).get(`/spas/${spa._id}`).set("Authorization", `Bearer ${superUserToken}`);
         expect(res.statusCode).toEqual(200);
         expect(res.body).toHaveProperty("_id", spa._id.toString());
+        expect(res.body).toHaveProperty("nom", spa.nom);
     });
 });
 
@@ -75,6 +83,9 @@ describe("Spas API, update spa", () => {
         const res = await request(app).put(`/spas/${spa._id}`).set("Authorization", `Bearer ${superUserToken}`).send(updatedSpa);
         expect(res.statusCode).toEqual(200);
         expect(res.body).toHaveProperty("nom", "SPA2");
+
+        const spaInDb = await Spa.findById(spa._id);
+        expect(spaInDb.nom).toEqual(updatedSpa.nom);
     });
 });
 
@@ -83,5 +94,8 @@ describe("Spas API, delete spa", () => {
 
         const res = await request(app).delete(`/spas/${spa._id}`).set("Authorization", `Bearer ${superUserToken}`);
         expect(res.statusCode).toEqual(204);
+
+        const spaInDb = await Spa.findById(spa._id);
+        expect(spaInDb).toBeNull();
     });
 });

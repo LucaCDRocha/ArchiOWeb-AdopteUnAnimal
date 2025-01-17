@@ -49,6 +49,9 @@ router.post("/", async (req, res, next) => {
 		const savedUser = await newUser.save();
 		res.status(201).send(savedUser);
 	} catch (err) {
+		if (err.code === 11000) {
+			return res.status(409).send({ message: "Email already exists" });
+		}
 		next(err);
 	}
 });
@@ -76,7 +79,6 @@ router.put("/:id", authenticate, loadUserByRequestId, async (req, res, next) => 
 		res.status(200).send(user);
 	} catch (err) {
 		if (err.code === 11000) {
-			// Duplicate key error
 			return res.status(409).send({ message: "Email already exists" });
 		}
 		next(err);

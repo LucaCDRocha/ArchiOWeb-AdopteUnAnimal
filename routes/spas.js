@@ -45,7 +45,7 @@ router.post("/", authenticate, function (req, res, next) {
 		})
 		.catch((err) => {
 			if (err.code === 11000) {
-				res.status(409).send("Spa name already exists");
+				res.status(409).send("Spa address is already taken");
 			}
 			next(err);
 		});
