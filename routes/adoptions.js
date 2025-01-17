@@ -51,6 +51,10 @@ router.post("/", authenticate, function (req, res, next) {
 			}
 		})
 		.catch((err) => {
+			// check if the error is due to a missing field
+			if (err.name === "ValidationError") {
+				res.status(400).send({ message: err.message });
+			}
 			next(err);
 		});
 });
@@ -70,12 +74,18 @@ router.get("/:id", authenticate, loadAdoptionByRequestId, function (req, res, ne
 	}
 });
 
-router.delete("/:id", authenticate, loadAdoptionByRequestId, function (req, res, next) {
+router.delete("/:id", authenticate, checkSpaLink, loadAdoptionByRequestId, function (req, res, next) {
 	const adoption = req.adoption;
-	adoption
-		.remove()
-		.then(() => res.sendStatus(204))
-		.catch((err) => next(err));
+	if (adoption.pet_id.spa_id._id.toString() !== req.spa._id.toString()) {
+		return res.status(403).send({ message: "Unauthorized" });
+	}
+	adoption.deleteOne()
+		.then(() => {
+			res.status(204).send();
+		})
+		.catch((err) => {
+			next(err);
+		});
 });
 
 router.get("/:id/messages", authenticate, loadAdoptionByRequestId, function (req, res, next) {

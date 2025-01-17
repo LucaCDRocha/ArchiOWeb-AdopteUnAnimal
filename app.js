@@ -1,15 +1,12 @@
 import express from "express";
 import createError from "http-errors";
 import logger from "morgan";
-import fs from "fs";
-import yaml from "js-yaml";
-import swaggerUi from "swagger-ui-express";
 import * as config from "./config.js";
 
 import mongoose from "mongoose";
 mongoose.connect(config.databaseUrl);
 
-import indexRouter from "./routes/index.js";
+import documentationsRouter from "./routes/documentations.js";
 import usersRouter from "./routes/users.js";
 import petsRouter from "./routes/pets.js";
 import spasRouter from "./routes/spas.js";
@@ -22,18 +19,9 @@ app.use(
 	cors({
 		origin: config.corsOrigin,
 		optionsSuccessStatus: 200,
-		exposedHeaders: [
-            'Pagination-Page',
-            'Pagination-Page-Size',
-            'Pagination-Total-Pages',
-            'Pagination-Total-Likes',
-        ],
+		exposedHeaders: ["Pagination-Page", "Pagination-Page-Size", "Pagination-Total-Pages", "Pagination-Total-Likes"],
 	})
 );
-// Parse the OpenAPI document.
-const openApiDocument = yaml.load(fs.readFileSync("./openapi.json"));
-// Serve the Swagger UI documentation.
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
 if (process.env.NODE_ENV !== "test") {
 	app.use(logger("dev"));
@@ -42,12 +30,14 @@ if (process.env.NODE_ENV !== "test") {
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use("/", indexRouter);
+app.use("/api-docs", documentationsRouter);
 app.use("/users", usersRouter);
 app.use("/pets", petsRouter);
 app.use("/spas", spasRouter);
 app.use("/adoptions", adoptionsRouter);
 app.use("/tags", tagsRouter);
+
+app.use("/", (req, res) => res.redirect("/api-docs"));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -42,13 +42,24 @@ router.get("/:id", authenticate, loadUserByRequestId, (req, res, next) => {
 
 router.post("/", async (req, res, next) => {
 	try {
-		const plainTextPassword = req.body.password;
-		const hash = await bcrypt.hash(plainTextPassword, config.bcryptCostFactor);
-		req.body.password = hash;
+		if (req.body.password) {
+			try {
+				req.body.password = await bcrypt.hash(req.body.password, config.bcryptCostFactor);
+			} catch (err) {
+				return next(err);
+			}
+		}
 		const newUser = new User(req.body);
 		const savedUser = await newUser.save();
 		res.status(201).send(savedUser);
 	} catch (err) {
+		if (err.code === 11000) {
+			res.status(409).send({ message: "Email already exists" });
+		}
+		// check if the error is due to a missing field
+		if (err.name === "ValidationError") {
+			res.status(400).send({ message: err.message });
+		}
 		next(err);
 	}
 });
@@ -76,7 +87,6 @@ router.put("/:id", authenticate, loadUserByRequestId, async (req, res, next) => 
 		res.status(200).send(user);
 	} catch (err) {
 		if (err.code === 11000) {
-			// Duplicate key error
 			return res.status(409).send({ message: "Email already exists" });
 		}
 		next(err);
@@ -200,6 +210,7 @@ async function getPetsByPreference(req, res, next, preference) {
 					as: "spa_id",
 				},
 			},
+			{ $unwind: "$spa_id" }, // Unwind spa_id to convert array to object
 			{
 				$lookup: {
 					from: "adoptions",
@@ -212,15 +223,7 @@ async function getPetsByPreference(req, res, next, preference) {
 				},
 			},
 			{
-				$project: {
-					nom: 1,
-					age: 1,
-					description: 1,
-					images: 1,
-					tags: 1,
-					spa_id: 1,
-					likes_count: 1,
-					dislikes_count: 1,
+				$addFields: {
 					adoptionId: { $arrayElemAt: ["$adoption._id", 0] },
 					adoptionStatus: { $arrayElemAt: ["$adoption.status", 0] },
 				},

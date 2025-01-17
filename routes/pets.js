@@ -75,6 +75,10 @@ router.post("/", authenticate, checkSpaLink, function (req, res, next) {
 			res.status(201).send(pet);
 		})
 		.catch((err) => {
+			// check if the error is due to a missing field
+			if (err.name === "ValidationError") {
+				res.status(400).send({ message: err.message });
+			}
 			next(err);
 		});
 });
