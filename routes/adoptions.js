@@ -4,6 +4,7 @@ import User from "../models/user.js";
 import Pet from "../models/pet.js";
 import { authenticate } from "../middleware/auth.js";
 import { wsSend } from "../websocket/websocket.js"; // Import the WebSocket status update function
+import { checkSpaLink } from "../middleware/user.js";
 
 const router = express.Router();
 
@@ -139,38 +140,36 @@ router.post("/:id/messages", authenticate, async function (req, res, next) {
 		adoption.messages.push(message);
 		const updatedAdoption = await adoption.save();
 
-		const userIds = [adoption.user_id.toString(), adoption.pet_id.spa_id.user_id.toString()];
-		const updatedMessages = { messages: updatedAdoption.messages, userIds };
+		const newMessage = updatedAdoption.messages[updatedAdoption.messages.length - 1];
 
-		wsSend("addMessage", req.params.id, message);
-		res.status(201).send(updatedMessages);
+		wsSend("addMessage", req.params.id, newMessage);
+		res.status(201).send(updatedAdoption.messages);
 	} catch (err) {
 		next(err);
 	}
 });
 
-router.delete("/:id/messages/:msg_id", authenticate, function (req, res, next) {
-	Adoption.findById(req.params.id)
-		.exec()
-		.then((adoption) => {
-			if (!adoption) {
-				return res.status(404).send({ message: "Adoption not found" });
-			}
-			const messageIndex = adoption.messages.findIndex((msg) => msg._id.toString() === req.params.msg_id);
-			if (messageIndex === -1) {
-				return res.status(404).send({ message: "Message not found" });
-			}
-			adoption.messages.splice(messageIndex, 1);
-			return adoption.save().then((updatedAdoption) => {
-				res.status(200).send(updatedAdoption.messages);
-			});
-		})
-		.catch((err) => {
-			next(err);
-		});
+router.delete("/:id/messages/:msg_id", authenticate, async function (req, res, next) {
+	try {
+		const adoption = await Adoption.findById(req.params.id).exec();
+		if (!adoption) {
+			return res.status(404).send({ message: "Adoption not found" });
+		}
+		const messageIndex = adoption.messages.findIndex((msg) => msg._id.toString() === req.params.msg_id);
+		if (messageIndex === -1) {
+			return res.status(404).send({ message: "Message not found" });
+		}
+		const deletedMessage = adoption.messages[messageIndex];
+		adoption.messages.splice(messageIndex, 1);
+		const updatedAdoption = await adoption.save();
+		wsSend("deleteMessage", req.params.id, deletedMessage);
+		res.status(200).send(updatedAdoption.messages);
+	} catch (err) {
+		next(err);
+	}
 });
 
-router.put("/:id/status", authenticate, async function (req, res, next) {
+router.put("/:id/status", authenticate, checkSpaLink, async function (req, res, next) {
 	try {
 		const adoption = await Adoption.findById(req.params.id).exec();
 		if (!adoption) {
