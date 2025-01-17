@@ -200,6 +200,7 @@ async function getPetsByPreference(req, res, next, preference) {
 					as: "spa_id",
 				},
 			},
+			{ $unwind: "$spa_id" }, // Unwind spa_id to convert array to object
 			{
 				$lookup: {
 					from: "adoptions",
@@ -212,15 +213,7 @@ async function getPetsByPreference(req, res, next, preference) {
 				},
 			},
 			{
-				$project: {
-					nom: 1,
-					age: 1,
-					description: 1,
-					images: 1,
-					tags: 1,
-					spa_id: 1,
-					likes_count: 1,
-					dislikes_count: 1,
+				$addFields: {
 					adoptionId: { $arrayElemAt: ["$adoption._id", 0] },
 					adoptionStatus: { $arrayElemAt: ["$adoption.status", 0] },
 				},
