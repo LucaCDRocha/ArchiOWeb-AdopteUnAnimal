@@ -24,24 +24,36 @@ export function setupWebSocketServer(httpServer) {
 				return;
 			}
 
-			const { adoptionId, message } = parsedData;
-			addMessageToAdoption(adoptionId, message)
-				.then((updatedMessages) => {
-					const userIds = updatedMessages.userIds;
-					wss.clients.forEach((client) => {
-						const clientInfo = clients.get(client);
-						if (
-							client.readyState === WebSocket.OPEN &&
-							userIds.includes(clientInfo.userId.toString()) &&
-							clientInfo.adoptionId === adoptionId
-						) {
-							client.send(JSON.stringify(message));
-						}
-					});
-				})
-				.catch((err) => {
-					console.error(err);
+			if (parsedData.type === "statusUpdate") {
+				const { adoptionId, status } = parsedData;
+				clients.forEach((client, clientWs) => {
+					if (clientWs.readyState === WebSocket.OPEN && client.adoptionId === adoptionId) {
+						clientWs.send(JSON.stringify({ type: "statusUpdate", status }));
+					}
 				});
+				return;
+			}
+
+			if (parsedData.type === "addMessage") {
+				const { adoptionId, message } = parsedData;
+				addMessageToAdoption(adoptionId, message)
+					.then((updatedMessages) => {
+						const userIds = updatedMessages.userIds;
+						wss.clients.forEach((client) => {
+							const clientInfo = clients.get(client);
+							if (
+								client.readyState === WebSocket.OPEN &&
+								userIds.includes(clientInfo.userId.toString()) &&
+								clientInfo.adoptionId === adoptionId
+							) {
+								client.send(JSON.stringify({ type: "addMessage", ...message }));
+							}
+						});
+					})
+					.catch((err) => {
+						console.error(err);
+					});
+			}
 		});
 
 		ws.on("close", () => {
