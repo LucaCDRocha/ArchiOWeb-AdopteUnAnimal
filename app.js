@@ -31,12 +31,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use("/api-docs", documentationsRouter);
-app.use("/", (req, res) => res.redirect("/api-docs"));
 app.use("/users", usersRouter);
 app.use("/pets", petsRouter);
 app.use("/spas", spasRouter);
 app.use("/adoptions", adoptionsRouter);
 app.use("/tags", tagsRouter);
+
+app.use("/", (req, res) => res.redirect("/api-docs"));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
