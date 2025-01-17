@@ -124,6 +124,12 @@ router.delete("/:id/messages/:msg_id", authenticate, loadAdoptionByRequestId, as
 router.put("/:id/status", authenticate, checkSpaLink, loadAdoptionByRequestId, async function (req, res, next) {
 	try {
 		const adoption = req.adoption;
+		if (req.body.status === "accepted") {
+			const existingAcceptedAdoption = await Adoption.findOne({ pet_id: adoption.pet_id, status: "accepted" }).exec();
+			if (existingAcceptedAdoption) {
+				return res.status(409).send({ message: "This pet has already been adopted." });
+			}
+		}
 		adoption.status = req.body.status;
 		await adoption.save();
 		switch (req.body.status) {
@@ -133,10 +139,7 @@ router.put("/:id/status", authenticate, checkSpaLink, loadAdoptionByRequestId, a
 				break;
 			case "pending":
 				await Pet.findByIdAndUpdate(adoption.pet_id, { isAdopted: false }, { new: true }).exec();
-				await Adoption.updateMany(
-					{ pet_id: adoption.pet_id, status: "unavailable" },
-					{ status: "pending" }
-				).exec();
+				await Adoption.updateMany({ pet_id: adoption.pet_id, status: "unavailable" }, { status: "pending" }).exec();
 				break;
 			default:
 				break;
