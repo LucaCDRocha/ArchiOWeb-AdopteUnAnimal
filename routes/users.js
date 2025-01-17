@@ -42,15 +42,23 @@ router.get("/:id", authenticate, loadUserByRequestId, (req, res, next) => {
 
 router.post("/", async (req, res, next) => {
 	try {
-		const plainTextPassword = req.body.password;
-		const hash = await bcrypt.hash(plainTextPassword, config.bcryptCostFactor);
-		req.body.password = hash;
+		if (req.body.password) {
+			try {
+				req.body.password = await bcrypt.hash(req.body.password, config.bcryptCostFactor);
+			} catch (err) {
+				return next(err);
+			}
+		}
 		const newUser = new User(req.body);
 		const savedUser = await newUser.save();
 		res.status(201).send(savedUser);
 	} catch (err) {
 		if (err.code === 11000) {
-			return res.status(409).send({ message: "Email already exists" });
+			res.status(409).send({ message: "Email already exists" });
+		}
+		// check if the error is due to a missing field
+		if (err.name === "ValidationError") {
+			res.status(400).send({ message: err.message });
 		}
 		next(err);
 	}

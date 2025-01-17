@@ -51,6 +51,10 @@ router.post("/", authenticate, function (req, res, next) {
 			}
 		})
 		.catch((err) => {
+			// check if the error is due to a missing field
+			if (err.name === "ValidationError") {
+				res.status(400).send({ message: err.message });
+			}
 			next(err);
 		});
 });

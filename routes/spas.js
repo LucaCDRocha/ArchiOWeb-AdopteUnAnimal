@@ -38,14 +38,18 @@ router.post("/", authenticate, function (req, res, next) {
 		user_id: req.currentUserId,
 	});
 
-	spa
-		.save()
+	spa.save()
 		.then((newSpa) => {
 			res.status(201).send(newSpa);
 		})
 		.catch((err) => {
+			// Check if the error is due to a duplicate key
 			if (err.code === 11000) {
-				res.status(409).send("Spa address is already taken");
+				res.status(409).send({ message: "Spa address is already taken" });
+			}
+			// check if the error is due to a missing field
+			if (err.name === "ValidationError") {
+				res.status(400).send({ message: err.message });
 			}
 			next(err);
 		});
@@ -68,7 +72,7 @@ router.get("/:id/pets", authenticate, loadSpaByRequestId, function (req, res, ne
 router.put("/:id", authenticate, loadSpaByRequestId, async function (req, res, next) {
 	const spa = req.spa;
 	spa.nom = req.body.nom;
-	spa.addresse = req.body.addresse;
+	spa.adresse = req.body.adresse;
 	spa.latitude = req.body.latitude;
 	spa.longitude = req.body.longitude;
 
@@ -88,21 +92,15 @@ router.delete("/:id", authenticate, loadSpaByRequestId, checkSpaLink, async func
 		const spaId = req.spa._id;
 		// Delete pets associated with the spa
 		const pets = await Pet.find({ spa_id: spaId });
-		const petIds = pets.map(pet => pet._id);
+		const petIds = pets.map((pet) => pet._id);
 		await Pet.deleteMany({ spa_id: spaId });
 
 		// Delete adoptions associated with the pets
 		await Adoption.deleteMany({ pet_id: { $in: petIds } });
 
 		// Remove pet ids from users' likes and dislikes
-		await User.updateMany(
-			{ likes: { $in: petIds } },
-			{ $pull: { likes: { $in: petIds } } }
-		);
-		await User.updateMany(
-			{ dislikes: { $in: petIds } },
-			{ $pull: { dislikes: { $in: petIds } } }
-		);
+		await User.updateMany({ likes: { $in: petIds } }, { $pull: { likes: { $in: petIds } } });
+		await User.updateMany({ dislikes: { $in: petIds } }, { $pull: { dislikes: { $in: petIds } } });
 
 		// Delete the spa
 		await req.spa.deleteOne();
