@@ -28,3 +28,12 @@ export function authenticate(req, res, next) {
 			res.status(401).send({ message: "Your token is invalid or has expired" });
 		});
 }
+
+export async function authenticateWebSocket(ws, token) {
+	try {
+		const payload = await verifyJwt(token, secret);
+		ws.currentUserId = payload.sub;
+	} catch (err) {
+		ws.close(1008, "Your token is invalid or has expired");
+	}
+}

@@ -1,5 +1,6 @@
 import { WebSocketServer } from "ws";
 import { addMessageToAdoption } from "./utils/adoptionUtils.js"; // Import the utility function
+import { authenticateWebSocket } from "./middleware/auth.js";
 
 const clients = new Map();
 
@@ -9,10 +10,17 @@ export function setupWebSocketServer(httpServer) {
 	wss.on("connection", (ws, req) => {
 		console.log("New client connected");
 
-		ws.on("message", (data) => {
+		ws.on("message", async (data) => {
 			const parsedData = JSON.parse(data);
 			if (parsedData.type === "authenticate") {
-				clients.set(ws, { userId: parsedData.userId, adoptionId: parsedData.adoptionId });
+				await authenticateWebSocket(ws, parsedData.token);
+				clients.set(ws, { userId: ws.currentUserId, adoptionId: parsedData.adoptionId });
+				return;
+			}
+
+			// Check if the client is authenticated
+			if (!clients.has(ws)) {
+				ws.close(1008, "You must authenticate first");
 				return;
 			}
 
