@@ -6,7 +6,7 @@ import * as config from "./config.js";
 import mongoose from "mongoose";
 mongoose.connect(config.databaseUrl);
 
-import indexRouter from "./routes/index.js";
+import documentationsRouter from "./routes/documentations.js";
 import usersRouter from "./routes/users.js";
 import petsRouter from "./routes/pets.js";
 import spasRouter from "./routes/spas.js";
@@ -19,12 +19,7 @@ app.use(
 	cors({
 		origin: config.corsOrigin,
 		optionsSuccessStatus: 200,
-		exposedHeaders: [
-            'Pagination-Page',
-            'Pagination-Page-Size',
-            'Pagination-Total-Pages',
-            'Pagination-Total-Likes',
-        ],
+		exposedHeaders: ["Pagination-Page", "Pagination-Page-Size", "Pagination-Total-Pages", "Pagination-Total-Likes"],
 	})
 );
 
@@ -35,7 +30,8 @@ if (process.env.NODE_ENV !== "test") {
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use("/", indexRouter);
+app.use("/docs", documentationsRouter);
+app.use("/", (req, res) => res.redirect("/docs"));
 app.use("/users", usersRouter);
 app.use("/pets", petsRouter);
 app.use("/spas", spasRouter);
