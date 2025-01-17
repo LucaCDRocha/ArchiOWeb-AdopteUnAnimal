@@ -1,6 +1,5 @@
 import { WebSocketServer } from "ws";
-import { addMessageToAdoption } from "./utils/adoptionUtils.js"; // Import the utility function
-import { authenticateWebSocket } from "./middleware/auth.js";
+import { authenticateWebSocket } from "./auth.js";
 
 let wss;
 

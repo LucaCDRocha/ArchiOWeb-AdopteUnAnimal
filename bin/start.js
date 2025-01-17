@@ -5,7 +5,7 @@ import http from "node:http";
 
 import app from "../app.js";
 import * as config from "../config.js";
-import { setupWebSocketServer } from "../websocket.js"; // Import the WebSocket setup function
+import { setupWebSocketServer } from "../websocket/websocket.js"; // Import the WebSocket setup function
 
 const debug = createDebugger("ArchiOWeb-AdopteUnAnimal:server");
 

@@ -3,8 +3,7 @@ import Adoption from "../models/adoption.js";
 import User from "../models/user.js";
 import Pet from "../models/pet.js";
 import { authenticate } from "../middleware/auth.js";
-import { addMessageToAdoption } from "../utils/adoptionUtils.js"; // Import the utility function
-import { wsSend } from "../websocket.js"; // Import the WebSocket status update function
+import { wsSend } from "../websocket/websocket.js"; // Import the WebSocket status update function
 
 const router = express.Router();
 
