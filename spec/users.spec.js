@@ -30,9 +30,6 @@ beforeEach(async () => {
     const loginRes = await request(app).post("/users/login").send(loginBody);
     superUserToken = loginRes.body.token;
 
-    // console.log("--------------------ICI--------------------");
-
-    // console.log(loginRes.body);
 });
 
 afterAll(async () => {
