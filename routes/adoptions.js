@@ -4,6 +4,7 @@ import User from "../models/user.js";
 import Pet from "../models/pet.js";
 import { authenticate } from "../middleware/auth.js";
 import { addMessageToAdoption } from "../utils/adoptionUtils.js"; // Import the utility function
+import { wsSend } from "../websocket.js"; // Import the WebSocket status update function
 
 const router = express.Router();
 
@@ -112,14 +113,41 @@ router.get("/:id/messages", authenticate, function (req, res, next) {
 		});
 });
 
-router.post("/:id/messages", authenticate, function (req, res, next) {
-	addMessageToAdoption(req.params.id, req.body)
-		.then((updatedMessages) => {
-			res.status(201).send(updatedMessages);
-		})
-		.catch((err) => {
-			next(err);
-		});
+router.post("/:id/messages", authenticate, async function (req, res, next) {
+	try {
+		const adoption = await Adoption.findById(req.params.id)
+			.populate({
+				path: "pet_id",
+				populate: [
+					{
+						path: "spa_id",
+						model: "Spa",
+					},
+				],
+			})
+			.exec();
+
+		if (!adoption) {
+			return res.status(404).send({ message: "Adoption not found" });
+		}
+
+		const message = {
+			content: req.body.content,
+			user_id: req.currentUserId,
+			date: new Date(),
+		};
+
+		adoption.messages.push(message);
+		const updatedAdoption = await adoption.save();
+
+		const userIds = [adoption.user_id.toString(), adoption.pet_id.spa_id.user_id.toString()];
+		const updatedMessages = { messages: updatedAdoption.messages, userIds };
+
+		wsSend("addMessage", req.params.id, message);
+		res.status(201).send(updatedMessages);
+	} catch (err) {
+		next(err);
+	}
 });
 
 router.delete("/:id/messages/:msg_id", authenticate, function (req, res, next) {
@@ -169,6 +197,7 @@ router.put("/:id/status", authenticate, async function (req, res, next) {
 				break;
 		}
 
+		wsSend("statusUpdate", adoption._id, adoption.status);
 		res.status(200).send(adoption);
 	} catch (err) {
 		next(err);
