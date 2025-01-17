@@ -1,19 +1,13 @@
 import express from "express";
-import Pet from "../models/pet.js";
+import fs from "fs";
+import yaml from "js-yaml";
+import swaggerUi from "swagger-ui-express";
+
 const router = express.Router();
 
-router.get("/", function (req, res, next) {
-  Pet.find()
-    .then((pets) => {
-      res.status(200).send(
-        `<img src="data:image/jpeg;base64,${pets[0].images[0].data.toString(
-          "base64"
-        )}" alt="Pet Image" height="50%">`
-      );
-    })
-    .catch((error) => {
-      res.status(500).send(error);
-    });
-});
+// Parse the OpenAPI document.
+const openApiDocument = yaml.load(fs.readFileSync("./openapi.json"));
+// Serve the Swagger UI documentation.
+router.use("/", swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
 export default router;
