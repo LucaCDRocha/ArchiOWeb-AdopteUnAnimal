@@ -2,20 +2,22 @@
 
 ## API REST
 
-Ce projet est une API REST construite avec Express.js, fournissant des points de terminaison pour l'authentification des utilisateurs, la gestion des animaux et la gestion des demandes d'adoption. Il est conçu pour faciliter l'adoption des animaux.
+Ce projet est une API REST construite avec Express.js, fournissant des endpoints pour l'authentification des utilisateurs, la gestion des animaux et la gestion des demandes d'adoption. Il est conçu pour faciliter l'adoption des animaux.
 
-## Table des Matières
+Le frontend de l'application est disponible [ici](https://devmobil-adopteunanimal.onrender.com/) et le dépôt est disponible [ici](https://github.com/LucaCDRocha/DevMobil-AdopteUnAnimal)
+
+## Table des matières
 
 - [ArchiOWeb-AdopteUnAnimal](#archioweb-adopteunanimal)
   - [API REST](#api-rest)
-  - [Table des Matières](#table-des-matières)
+  - [Table des matières](#table-des-matières)
   - [Installation](#installation)
   - [Configuration](#configuration)
-  - [Exécution de l'Application](#exécution-de-lapplication)
-  - [Peuplement de la Base de Données](#peuplement-de-la-base-de-données)
+  - [Exécution de l'application](#exécution-de-lapplication)
+  - [Peuplement de la base de données](#peuplement-de-la-base-de-données)
     - [Prérequis](#prérequis)
-    - [Exécution des Seeders](#exécution-des-seeders)
-  - [Exécution des Tests](#exécution-des-tests)
+    - [Exécution des seeders](#exécution-des-seeders)
+  - [Exécution des tests](#exécution-des-tests)
   - [Documentation de l'API](#documentation-de-lapi)
 
 ## Installation
@@ -37,7 +39,7 @@ npm install
 
 Créez un fichier `.env` à la racine du répertoire et fournissez les variables d'environnement indiquées dans le fichier `.env.example`.
 
-## Exécution de l'Application
+## Exécution de l'application
 
 Pour démarrer l'application en mode développement, exécutez :
 
@@ -51,7 +53,7 @@ Pour démarrer l'application en mode production, exécutez :
 npm start
 ```
 
-## Peuplement de la Base de Données
+## Peuplement de la base de données
 
 Pour faciliter le processus de développement et de test, vous pouvez peupler la base de données avec des données initiales.
 
@@ -59,7 +61,7 @@ Pour faciliter le processus de développement et de test, vous pouvez peupler la
 
 Assurez-vous que MongoDB est en cours d'exécution.
 
-### Exécution des Seeders
+### Exécution des seeders
 
 Pour peupler la base de données, exécutez la commande suivante :
 
@@ -67,7 +69,7 @@ Pour peupler la base de données, exécutez la commande suivante :
 npm run seed
 ```
 
-## Exécution des Tests
+## Exécution des tests
 
 Pour exécuter les tests, utilisez la commande suivante :
 

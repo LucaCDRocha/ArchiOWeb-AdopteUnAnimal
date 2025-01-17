@@ -11,6 +11,7 @@ const router = express.Router();
 
 router.get("/", authenticate, function (req, res, next) {
 	Adoption.find()
+		.populate("user_id")
 		.populate({
 			path: "pet_id",
 			populate: [
@@ -79,7 +80,8 @@ router.delete("/:id", authenticate, checkSpaLink, loadAdoptionByRequestId, funct
 	if (adoption.pet_id.spa_id._id.toString() !== req.spa._id.toString()) {
 		return res.status(403).send({ message: "Unauthorized" });
 	}
-	adoption.deleteOne()
+	adoption
+		.deleteOne()
 		.then(() => {
 			res.status(204).send();
 		})
@@ -134,29 +136,84 @@ router.delete("/:id/messages/:msg_id", authenticate, loadAdoptionByRequestId, as
 router.put("/:id/status", authenticate, checkSpaLink, loadAdoptionByRequestId, async function (req, res, next) {
 	try {
 		const adoption = req.adoption;
+		const previousStatus = adoption.status;
+
 		if (req.body.status === "accepted") {
-			const existingAcceptedAdoption = await Adoption.findOne({ pet_id: adoption.pet_id, status: "accepted" }).exec();
+			const existingAcceptedAdoption = await Adoption.findOne({
+				pet_id: adoption.pet_id,
+				status: "accepted",
+			}).exec();
 			if (existingAcceptedAdoption) {
 				return res.status(409).send({ message: "This pet has already been adopted." });
 			}
 		}
+
 		adoption.status = req.body.status;
-		await adoption.save();
-		switch (req.body.status) {
-			case "accepted":
-				await Pet.findByIdAndUpdate(adoption.pet_id, { isAdopted: true }, { new: true }).exec();
-				await Adoption.updateMany({ pet_id: adoption.pet_id, status: "pending" }, { status: "unavailable" }).exec();
-				break;
-			case "pending":
-				await Pet.findByIdAndUpdate(adoption.pet_id, { isAdopted: false }, { new: true }).exec();
-				await Adoption.updateMany({ pet_id: adoption.pet_id, status: "unavailable" }, { status: "pending" }).exec();
-				break;
-			case "rejected":
-				await Pet.findByIdAndUpdate(adoption.pet_id, { isAdopted: false }, { new: true }).exec();
-				await Adoption.updateMany({ pet_id: adoption.pet_id, status: "unavailable" }, { status: "pending" }).exec();
-			default:
-				break;
+
+		if (req.body.status !== "unavailable") {
+			switch (previousStatus) {
+				case "pending":
+					switch (req.body.status) {
+						case "accepted":
+							await Pet.findByIdAndUpdate(adoption.pet_id, { isAdopted: true }, { new: true }).exec();
+							await Adoption.updateMany(
+								{ pet_id: adoption.pet_id, status: "pending" },
+								{ status: "unavailable" }
+							).exec();
+							break;
+						case "rejected":
+							await Pet.findByIdAndUpdate(adoption.pet_id, { isAdopted: false }, { new: true }).exec();
+							break;
+						default:
+							return res.status(400).send({ message: "Invalid status transition" });
+					}
+					break;
+				case "accepted":
+					switch (req.body.status) {
+						case "pending":
+							await Pet.findByIdAndUpdate(adoption.pet_id, { isAdopted: false }, { new: true }).exec();
+							await Adoption.updateMany(
+								{ pet_id: adoption.pet_id, status: "unavailable" },
+								{ status: "pending" }
+							).exec();
+							break;
+						case "rejected":
+							await Pet.findByIdAndUpdate(adoption.pet_id, { isAdopted: false }, { new: true }).exec();
+							await Adoption.updateMany(
+								{ pet_id: adoption.pet_id, status: "unavailable" },
+								{ status: "pending" }
+							).exec();
+							break;
+						default:
+							return res.status(400).send({ message: "Invalid status transition" });
+					}
+					break;
+				case "rejected":
+					switch (req.body.status) {
+						case "pending":
+							await Pet.findByIdAndUpdate(adoption.pet_id, { isAdopted: false }, { new: true }).exec();
+							break;
+						case "accepted":
+							await Pet.findByIdAndUpdate(adoption.pet_id, { isAdopted: true }, { new: true }).exec();
+							await Adoption.updateMany(
+								{ pet_id: adoption.pet_id, status: "pending" },
+								{ status: "unavailable" }
+							).exec();
+							break;
+						default:
+							return res.status(400).send({ message: "Invalid status transition" });
+					}
+					break;
+				case "unavailable":
+					return res.status(400).send({ message: "Cannot change status from unavailable" });
+				default:
+					return res.status(400).send({ message: "Invalid previous status" });
+			}
+		} else {
+			return res.status(400).send({ message: "Cannot change status to unavailable" });
 		}
+
+		await adoption.save();
 		wsSend("statusUpdate", adoption._id, adoption.status);
 		res.status(200).send(adoption);
 	} catch (err) {
