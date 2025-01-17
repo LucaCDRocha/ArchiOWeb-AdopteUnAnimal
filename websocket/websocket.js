@@ -15,7 +15,6 @@ export function setupWebSocketServer(httpServer) {
 				await authenticateWebSocket(ws, parsedData.token);
 				ws.userId = ws.currentUserId;
 				ws.adoptionId = parsedData.adoptionId;
-				console.log("Client authenticated:", ws.userId);
 				return;
 			}
 		});
