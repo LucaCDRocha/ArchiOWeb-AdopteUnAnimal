@@ -129,12 +129,12 @@ router.put("/:id/status", authenticate, checkSpaLink, loadAdoptionByRequestId, a
 		switch (req.body.status) {
 			case "accepted":
 				await Pet.findByIdAndUpdate(adoption.pet_id, { isAdopted: true }, { new: true }).exec();
-				await Adoption.updateMany({ pet_id: adoption.pet_id, status: "pending" }, { status: "rejected" }).exec();
+				await Adoption.updateMany({ pet_id: adoption.pet_id, status: "pending" }, { status: "unavailable" }).exec();
 				break;
 			case "pending":
 				await Pet.findByIdAndUpdate(adoption.pet_id, { isAdopted: false }, { new: true }).exec();
 				await Adoption.updateMany(
-					{ pet_id: adoption.pet_id, status: { $ne: "accepted" } },
+					{ pet_id: adoption.pet_id, status: "unavailable" },
 					{ status: "pending" }
 				).exec();
 				break;
