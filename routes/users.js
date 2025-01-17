@@ -91,12 +91,12 @@ router.delete("/:id", authenticate, loadUserByRequestId, async (req, res, next) 
 	try {
 		// Delete user's adoptions
 		await Adoption.deleteMany({ user_id: req.currentUserId });
-		
+
 		// Delete user's likes
 		if (req.user.likes && req.user.likes.length > 0) {
 			await Pet.updateMany({ _id: { $in: req.user.likes } }, { $inc: { likes_count: -1 } });
 		}
-		
+
 		// Check if user is part of a spa and delete pets if so
 		const spa = await Spa.findOne({ user_id: req.currentUserId }).exec();
 		if (spa) {
@@ -163,11 +163,11 @@ router.get("/:id/adoptions", authenticate, loadUserByRequestId, async (req, res,
 	}
 });
 
-router.get("/:id/likes", authenticate, async (req, res, next) => {
+async function getPetsByPreference(req, res, next, preference) {
 	try {
 		const user = await User.findById(req.params.id)
 			.populate({
-				path: "likes",
+				path: preference,
 				match: { isAdopted: false },
 				populate: [
 					{ path: "tags", model: "Tag" },
@@ -177,13 +177,13 @@ router.get("/:id/likes", authenticate, async (req, res, next) => {
 			.exec();
 
 		const page = parseInt(req.query.page) || 1;
-		const pageSize = parseInt(req.query.pageSize) || 0;
+		const pageSize = parseInt(req.query.pageSize) || (parseInt(req.query.page) ? 3 : 0);
 
-		const totalLikes = user.likes.length;
-		const totalPages = pageSize > 0 ? Math.ceil(totalLikes / pageSize) : 0;
+		const totalItems = user[preference].length;
+		const totalPages = pageSize > 0 ? Math.ceil(totalItems / pageSize) : 0;
 
 		const queryAggregation = [
-			{ $match: { _id: { $in: user.likes }, isAdopted: false } },
+			{ $match: { _id: { $in: user[preference] }, isAdopted: false } },
 			{
 				$lookup: {
 					from: "tags",
@@ -230,39 +230,28 @@ router.get("/:id/likes", authenticate, async (req, res, next) => {
 		if (pageSize > 0) {
 			queryAggregation.push({ $skip: (page - 1) * pageSize });
 			queryAggregation.push({ $limit: pageSize });
+			res.set({
+				[`Pagination-Total-${preference.charAt(0).toUpperCase() + preference.slice(1)}`]: totalItems,
+				"Pagination-Total-Pages": totalPages,
+				"Pagination-Page-Size": pageSize,
+				"Pagination-Page": page,
+			});
 		}
 
 		const pets = await Pet.aggregate(queryAggregation).exec();
-
-		res.set({
-			"Pagination-Total-Likes": totalLikes,
-			"Pagination-Total-Pages": totalPages,
-			"Pagination-Page-Size": pageSize,
-			"Pagination-Page": page,
-		});
 
 		res.status(200).send(pets);
 	} catch (err) {
 		next(err);
 	}
+}
+
+router.get("/:id/likes", authenticate, (req, res, next) => {
+	getPetsByPreference(req, res, next, "likes");
 });
 
-router.get("/:id/dislikes", authenticate, async (req, res, next) => {
-	try {
-		const user = await User.findById(req.params.id)
-			.populate({
-				path: "dislikes",
-				match: { isAdopted: false },
-				populate: [
-					{ path: "tags", model: "Tag" },
-					{ path: "spa_id", model: "Spa" },
-				],
-			})
-			.exec();
-		res.status(200).send(user.dislikes);
-	} catch (err) {
-		next(err);
-	}
+router.get("/:id/dislikes", authenticate, (req, res, next) => {
+	getPetsByPreference(req, res, next, "dislikes");
 });
 
 router.post("/login", async (req, res, next) => {
