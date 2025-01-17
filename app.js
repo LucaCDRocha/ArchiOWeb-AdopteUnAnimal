@@ -30,8 +30,8 @@ if (process.env.NODE_ENV !== "test") {
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use("/docs", documentationsRouter);
-app.use("/", (req, res) => res.redirect("/docs"));
+app.use("/api-docs", documentationsRouter);
+app.use("/", (req, res) => res.redirect("/api-docs"));
 app.use("/users", usersRouter);
 app.use("/pets", petsRouter);
 app.use("/spas", spasRouter);
