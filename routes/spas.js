@@ -69,6 +69,8 @@ router.put("/:id", authenticate, loadSpaByRequestId, async function (req, res, n
 	const spa = req.spa;
 	spa.nom = req.body.nom;
 	spa.addresse = req.body.addresse;
+	spa.latitude = req.body.latitude;
+	spa.longitude = req.body.longitude;
 
 	try {
 		const updatedSpa = await spa.save();
