@@ -141,6 +141,9 @@ router.put("/:id/status", authenticate, checkSpaLink, loadAdoptionByRequestId, a
 				await Pet.findByIdAndUpdate(adoption.pet_id, { isAdopted: false }, { new: true }).exec();
 				await Adoption.updateMany({ pet_id: adoption.pet_id, status: "unavailable" }, { status: "pending" }).exec();
 				break;
+			case "rejected":
+				await Pet.findByIdAndUpdate(adoption.pet_id, { isAdopted: false }, { new: true }).exec();
+				await Adoption.updateMany({ pet_id: adoption.pet_id, status: "unavailable" }, { status: "pending" }).exec();
 			default:
 				break;
 		}
