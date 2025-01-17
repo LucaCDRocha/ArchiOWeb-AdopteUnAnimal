@@ -75,7 +75,7 @@ describe("Adoptions API, get adoptions", () => {
 		expect(res.body).toBeInstanceOf(Array);
 		expect(res.body.length).toBeGreaterThan(0);
 		expect(res.body[0]).toHaveProperty("pet_id._id", pet._id.toString());
-		expect(res.body[0]).toHaveProperty("user_id", superUser._id.toString());
+		expect(res.body[0]).toHaveProperty("user_id._id", superUser._id.toString());
 		expect(res.body[0]).toHaveProperty("date");
 	});
 });

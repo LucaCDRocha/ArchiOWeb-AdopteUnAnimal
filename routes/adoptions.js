@@ -11,6 +11,7 @@ const router = express.Router();
 
 router.get("/", authenticate, function (req, res, next) {
 	Adoption.find()
+		.populate("user_id")
 		.populate({
 			path: "pet_id",
 			populate: [
